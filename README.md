@@ -10,3 +10,16 @@ Add them via the Package Manager or ensure `Packages/manifest.json` lists:
 
 After installing **AI Navigation**, add a `NavMeshSurface` to a GameObject and bake
 the NavMesh to enable infantry movement.
+
+### Scene Preparation
+1. Add the `RTSCameraController` component to your main camera.
+2. Create infantry prefabs with a `NavMeshAgent` and an `EntityReference` component.
+3. Place these prefabs in the scene; systems will convert them to entities at runtime.
+4. Bake the NavMesh and press Play – selected units should navigate on right click.
+
+### Controls
+- **Left Click**: select a single unit. Drag to marquee-select multiple units.
+- **Shift + Click/Drag**: add or remove units from the current selection.
+- **Right Click**: move all selected units to the clicked position.
+
+These scripts use Entities 1.0 with the new Input System and hybrid NavMesh navigation.
