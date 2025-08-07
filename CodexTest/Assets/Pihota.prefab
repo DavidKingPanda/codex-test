@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 6809993889790912428}
   - component: {fileID: 8645893187784844036}
   - component: {fileID: 1015709811387149529}
+  - component: {fileID: 3045458110581887483}
   m_Layer: 0
-  m_Name: Pihota 1
+  m_Name: Pihota
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -68,6 +69,18 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &3045458110581887483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484770817544696201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1819d3fdc0f24954ad63eede106e5048, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3667335527970148832
 GameObject:
   m_ObjectHideFlags: 0
