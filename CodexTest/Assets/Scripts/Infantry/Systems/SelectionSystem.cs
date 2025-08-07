@@ -66,8 +66,6 @@ namespace RTS.Infantry
             if (!additive)
                 ClearSelection();
 
-        private void SingleSelect(Vector2 screenPos)
-        {
             var ray = _camera.ScreenPointToRay(screenPos);
             if (Physics.Raycast(ray, out var hit))
             {
@@ -78,8 +76,6 @@ namespace RTS.Infantry
                     {
                         if (!EntityManager.HasComponent<SelectedTag>(entity))
                             EntityManager.AddComponent<SelectedTag>(entity);
-
-                        EntityManager.AddComponent<SelectedTag>(entity);
                     }
                 }
             }
@@ -110,7 +106,6 @@ namespace RTS.Infantry
                             EntityManager.AddComponent<SelectedTag>(entity);
                     }
                 }).Run();
-            // TODO: Implement marquee selection logic
         }
     }
 }
