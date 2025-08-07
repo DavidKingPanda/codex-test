@@ -69,7 +69,8 @@ namespace RTS.Infantry
             var ray = _camera.ScreenPointToRay(screenPos);
             if (Physics.Raycast(ray, out var hit))
             {
-                if (hit.transform.TryGetComponent<EntityReference>(out var reference))
+                var reference = hit.transform.GetComponentInParent<EntityReference>();
+                if (reference != null)
                 {
                     var entity = reference.Entity;
                     if (EntityManager.Exists(entity) && EntityManager.HasComponent<InfantryTag>(entity))
