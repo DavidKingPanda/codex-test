@@ -1,4 +1,6 @@
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -46,6 +48,24 @@ namespace RTS.Infantry
             }
         }
 
+        private void ClearSelection()
+        {
+            Entities
+                .WithAll<SelectedTag>()
+                .WithStructuralChanges()
+                .ForEach((Entity entity) =>
+                {
+                    EntityManager.RemoveComponent<SelectedTag>(entity);
+                }).Run();
+        }
+
+        private void SingleSelect(Vector2 screenPos)
+        {
+            var keyboard = Keyboard.current;
+            bool additive = keyboard != null && keyboard.shiftKey.isPressed;
+            if (!additive)
+                ClearSelection();
+
         private void SingleSelect(Vector2 screenPos)
         {
             var ray = _camera.ScreenPointToRay(screenPos);
@@ -56,6 +76,9 @@ namespace RTS.Infantry
                     var entity = reference.Entity;
                     if (EntityManager.Exists(entity) && EntityManager.HasComponent<InfantryTag>(entity))
                     {
+                        if (!EntityManager.HasComponent<SelectedTag>(entity))
+                            EntityManager.AddComponent<SelectedTag>(entity);
+
                         EntityManager.AddComponent<SelectedTag>(entity);
                     }
                 }
@@ -64,6 +87,29 @@ namespace RTS.Infantry
 
         private void DragSelect(Vector2 start, Vector2 end)
         {
+            var keyboard = Keyboard.current;
+            bool additive = keyboard != null && keyboard.shiftKey.isPressed;
+            if (!additive)
+                ClearSelection();
+
+            var rect = Rect.MinMaxRect(
+                math.min(start.x, end.x),
+                math.min(start.y, end.y),
+                math.max(start.x, end.x),
+                math.max(start.y, end.y));
+
+            Entities
+                .WithAll<InfantryTag>()
+                .WithStructuralChanges()
+                .ForEach((Entity entity, in LocalToWorld transform) =>
+                {
+                    Vector3 screen = _camera.WorldToScreenPoint(transform.Position);
+                    if (rect.Contains((Vector2)screen))
+                    {
+                        if (!EntityManager.HasComponent<SelectedTag>(entity))
+                            EntityManager.AddComponent<SelectedTag>(entity);
+                    }
+                }).Run();
             // TODO: Implement marquee selection logic
         }
     }
