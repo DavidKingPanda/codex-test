@@ -1,15 +1,14 @@
 # Setup Guide
 
-This project targets **Unity 2022.3.33f1** and implements a minimal server-authoritative ECS
-foundation.
+This repository demonstrates a minimal server-authoritative ECS framework for **Unity 2022.3.33f1**. Follow these steps to set up the project and run both client and server on the same machine.
 
-## Required Unity Packages
-Install via *Window → Package Manager*:
+## 1. Install Unity Packages
+Open **Window → Package Manager** and install:
 
 - `com.unity.transport` – Unity Transport for networking
-- `com.unity.inputsystem` – New Input System for capturing player input
+- `com.unity.inputsystem` – Input System for capturing player input
 
-## Folder Structure
+## 2. Create Folder Structure
 Create the following folders under `Assets/`:
 
 ```
@@ -22,43 +21,46 @@ Assets/
       Commands/
       ECS/
     Infrastructure/
-    Utils/ (reserved)
+    Presentation/
+    Utils/        (reserved)
 ```
 
-Place the provided `.cs` files into the matching folders.
+Place the provided `.cs` files into their matching folders.
 
-## Headless Server Build
-1. Open **File → Build Settings**.
-2. Check **Server Build** to create a headless executable.
-3. In a bootstrap script, create and wire:
+## 3. Server Bootstrap (Headless)
+1. Create an empty scene for the server.
+2. Add a `GameObject` named **Server** and attach `ServerBootstrap`.
+3. `ServerBootstrap` wires together:
    - `EventBus`
    - `World`
-   - `NetworkManager` (call `StartServer(port)`)
+   - `NetworkManager` (`StartServer(port)`)
    - `ServerCommandDispatcher`
    - `MovementSystem`
-4. On every tick call `networkManager.Update()` and `movementSystem.Update(world, deltaTime)`.
+   - `ReplicationSystem`
+4. Open **File → Build Settings** and enable **Server Build** to produce a headless executable.
 
-## Client Scene Setup
-1. In the client scene create a `GameObject` named `Client`.
-2. Add components:
-   - `NetworkManager` (call `StartClient(address, port)` at start)
-   - `ClientInputSender` – reference the `NetworkManager`.
-   - `PlayerInput` (from Input System) with an action *Move* mapped to WASD or stick.
-     Set the action to call `ClientInputSender.OnMove`.
-3. Runtime-created entities should be mirrored on the client for rendering only.
+## 4. Client Scene
+1. Create a new scene for the client.
+2. Add an empty `GameObject` named **Client** and attach `ClientBootstrap`.
+3. `ClientBootstrap` references:
+   - `ClientInputSender`
+   - `ClientSnapshotReceiver`
+   - a player visual `Transform` used for rendering
+   - `CameraFollow` on the main camera for top‑down tracking
+4. Add a `PlayerInput` component with an action **Move** bound to WASD/left stick and set it to call `ClientInputSender.OnMove`.
+5. The client only renders state and sends input; all gameplay logic runs on the server.
 
-## Local Network Testing
-1. Build and run the server headless (or run a `ServerBootstrap` script in the Editor).
+## 5. Running Locally
+1. Start the headless server build or play the server scene in the Editor.
 2. Play the client scene in the Editor or as a standalone build.
-3. Both can run on the same machine using `localhost` and the same port.
+3. Use `localhost` and the same port so both run on one machine.
 
-## Project Structure Overview
+## 6. Project Overview
 - **Domain/ECS** – core ECS types (`Entity`, `World`, `ISystem`, `IComponent`).
-- **Components** – data-only components like `PositionComponent`.
-- **Systems** – server systems such as `MovementSystem` reacting to events.
+- **Components** – data-only components such as `PositionComponent`.
+- **Systems** – server logic like `MovementSystem` responding to events.
 - **Networking** – `NetworkManager` wrapper around Unity Transport.
-- **Infrastructure** – plumbing: `EventBus`, `ClientInputSender`, `ServerCommandDispatcher`.
-- **Domain/Commands** – command structs (e.g., `MoveCommand`).
+- **Infrastructure** – glue code (`EventBus`, `ClientInputSender`, `ServerCommandDispatcher`, `ClientBootstrap`, `ServerBootstrap`).
+- **Presentation** – visuals and camera scripts (`CameraFollow`).
 
-This foundation establishes a clean separation of concerns and an event-driven,
-server-authoritative workflow ready for further expansion.
+This setup yields a clean, event-driven, server‑authoritative ECS base where a player entity moves with WASD, the server replicates the position, and the client camera follows from a top‑down perspective.
