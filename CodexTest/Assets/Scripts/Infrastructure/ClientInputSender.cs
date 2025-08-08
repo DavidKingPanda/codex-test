@@ -13,6 +13,7 @@ namespace Game.Infrastructure
     {
         private NetworkManager networkManager;
         [SerializeField] private float moveSpeed = 5f;
+        private Vector2 _input;
         public Entity PlayerEntity { get; private set; }
 
         /// <summary>
@@ -26,19 +27,28 @@ namespace Game.Infrastructure
 
         /// <summary>
         /// Called by Unity's Input System when the Move action is triggered.
-        /// Translates the 2D input into a 3D direction and sends a MoveCommand
-        /// to the server. Movement occurs only on the server.
+        /// Stores the current 2D input direction. Actual commands are sent
+        /// each frame from Update for smooth continuous movement.
         /// </summary>
         public void OnMove(InputAction.CallbackContext context)
         {
-            if (!context.performed)
-                return;
-            Vector2 input = context.ReadValue<Vector2>();
-            if (input == Vector2.zero)
+            if (context.performed)
+            {
+                _input = context.ReadValue<Vector2>();
+            }
+            else if (context.canceled)
+            {
+                _input = Vector2.zero;
+            }
+        }
+
+        private void Update()
+        {
+            if (_input == Vector2.zero)
                 return;
 
-            var direction = new Vector3(input.x, 0f, input.y);
-            var command = new MoveCommand(PlayerEntity, direction, moveSpeed * Time.deltaTime);
+            var direction = new Vector3(_input.x, 0f, _input.y);
+            var command = new MoveCommand(PlayerEntity, direction, moveSpeed);
             networkManager.SendMessage(command);
         }
     }
