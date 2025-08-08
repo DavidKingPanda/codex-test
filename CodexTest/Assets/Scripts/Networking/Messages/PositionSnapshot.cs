@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Game.Domain.ECS;
 
@@ -6,6 +7,7 @@ namespace Game.Networking.Messages
     /// <summary>
     /// Snapshot message sent from server to clients with entity position.
     /// </summary>
+    [Serializable]
     public readonly struct PositionSnapshot
     {
         public readonly int EntityId;
