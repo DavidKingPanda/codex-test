@@ -1,8 +1,8 @@
 using System;
 using System.Text;
-using System.Text.Json;
 using Unity.Collections;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 
 namespace Game.Networking
@@ -75,14 +75,16 @@ namespace Game.Networking
             if (!_connection.IsCreated)
                 return;
             using var nativeArray = new NativeArray<byte>(bytes, Allocator.Temp);
-            var writer = _driver.BeginSend(_connection);
-            writer.WriteBytes(nativeArray);
-            _driver.EndSend(writer);
+            if (_driver.BeginSend(_connection, out var writer) == 0)
+            {
+                writer.WriteBytes(nativeArray);
+                _driver.EndSend(writer);
+            }
         }
 
         public void SendMessage<T>(T message)
         {
-            var json = JsonSerializer.Serialize(message);
+            var json = JsonUtility.ToJson(message);
             SendBytes(Encoding.UTF8.GetBytes(json));
         }
 

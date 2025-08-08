@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Json;
 using Game.Networking;
 using Game.Networking.Messages;
 using Unity.Collections;
@@ -28,7 +27,7 @@ namespace Game.Infrastructure
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
             var json = Encoding.UTF8.GetString(bytes.ToArray());
-            var snapshot = JsonSerializer.Deserialize<PositionSnapshot>(json);
+            var snapshot = JsonUtility.FromJson<PositionSnapshot>(json);
             if (snapshot != null && playerVisual != null && snapshot.EntityId == 0)
             {
                 playerVisual.position = snapshot.Position;
