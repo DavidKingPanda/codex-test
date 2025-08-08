@@ -1,8 +1,8 @@
 using System;
 using System.Text;
-using System.Text.Json;
 using Unity.Collections;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 using Game.Domain.Commands;
 using Game.Networking;
@@ -29,7 +29,7 @@ namespace Game.Infrastructure
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
             var json = Encoding.UTF8.GetString(bytes.ToArray());
-            var move = JsonSerializer.Deserialize<MoveCommand>(json);
+            var move = JsonUtility.FromJson<MoveCommand>(json);
             if (move != null)
             {
                 _eventBus.Publish(move);
