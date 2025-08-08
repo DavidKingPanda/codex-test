@@ -38,9 +38,11 @@ namespace Game.Networking
 
         public void Update()
         {
+            if (!_driver.IsCreated)
+                return;
             _driver.ScheduleUpdate().Complete();
 
-            if (_driver.IsCreated && !_connection.IsCreated)
+            if (!_connection.IsCreated)
             {
                 // Accept incoming connection on the server.
                 var connection = _driver.Accept();

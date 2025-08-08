@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Unity.Collections;
+using Unity.Networking.Transport;
 
 using Game.Domain.Commands;
 using Game.Networking;
@@ -10,7 +11,7 @@ namespace Game.Infrastructure
     /// <summary>
     /// Listens for incoming network data and publishes commands to the event bus.
     /// </summary>
-    public class ServerCommandDispatcher
+    public class ServerCommandDispatcher : IDisposable
     {
         private readonly NetworkManager _networkManager;
         private readonly EventBus _eventBus;
@@ -24,12 +25,19 @@ namespace Game.Infrastructure
 
         private void OnDataReceived(DataStreamReader stream)
         {
-            var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
+            using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
             var json = Encoding.UTF8.GetString(bytes.ToArray());
-            bytes.Dispose();
             var move = JsonSerializer.Deserialize<MoveCommand>(json);
-            _eventBus.Publish(move);
+            if (move != null)
+            {
+                _eventBus.Publish(move);
+            }
+        }
+
+        public void Dispose()
+        {
+            _networkManager.OnData -= OnDataReceived;
         }
     }
 }
