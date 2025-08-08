@@ -27,7 +27,12 @@ namespace Game.Infrastructure
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
             var json = Encoding.UTF8.GetString(bytes.ToArray());
-            var snapshot = JsonUtility.FromJson<PositionSnapshot>(json);
+
+            var message = JsonUtility.FromJson<NetworkMessage>(json);
+            if (message.Type != MessageType.PositionSnapshot)
+                return;
+
+            var snapshot = JsonUtility.FromJson<PositionSnapshot>(message.Payload);
             if (!snapshot.Equals(default(PositionSnapshot)) && playerVisual != null && snapshot.EntityId == 0)
             {
                 playerVisual.position = snapshot.Position;
