@@ -38,6 +38,17 @@ namespace Game.Networking
         public void Update()
         {
             _driver.ScheduleUpdate().Complete();
+
+            if (_driver.IsCreated && !_connection.IsCreated)
+            {
+                // Accept incoming connection on the server.
+                var connection = _driver.Accept();
+                if (connection.IsCreated)
+                {
+                    _connection = connection;
+                }
+            }
+
             if (_connection.IsCreated)
             {
                 DataStreamReader stream;
@@ -47,6 +58,10 @@ namespace Game.Networking
                     if (cmd == NetworkEvent.Type.Data)
                     {
                         OnData?.Invoke(stream);
+                    }
+                    else if (cmd == NetworkEvent.Type.Disconnect)
+                    {
+                        _connection = default;
                     }
                 }
             }

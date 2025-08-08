@@ -1,6 +1,7 @@
 using Game.Components;
 using Game.Domain.Commands;
 using Game.Domain.ECS;
+using Game.Domain.Events;
 using Game.Infrastructure;
 
 namespace Game.Systems
@@ -31,6 +32,7 @@ namespace Game.Systems
             {
                 position.Value += command.Direction.normalized * command.Speed;
                 _world.SetComponent(command.Entity, position);
+                _eventBus.Publish(new PositionChangedEvent(command.Entity, position.Value));
             }
         }
     }

@@ -11,10 +11,19 @@ namespace Game.Infrastructure
     /// </summary>
     public class ClientInputSender : MonoBehaviour
     {
-        [SerializeField] private NetworkManager networkManager;
+        private NetworkManager networkManager;
         [SerializeField] private float moveSpeed = 5f;
         private Vector2 moveInput;
-        public Entity PlayerEntity { get; set; }
+        public Entity PlayerEntity { get; private set; }
+
+        /// <summary>
+        /// Injects dependencies from ClientBootstrap.
+        /// </summary>
+        public void Initialize(NetworkManager manager, Entity playerEntity)
+        {
+            networkManager = manager;
+            PlayerEntity = playerEntity;
+        }
 
         public void OnMove(InputAction.CallbackContext context)
         {
