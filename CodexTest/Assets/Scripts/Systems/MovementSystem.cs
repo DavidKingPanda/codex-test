@@ -13,6 +13,7 @@ namespace Game.Systems
     {
         private readonly World _world;
         private readonly EventBus _eventBus;
+        private float _deltaTime;
 
         public MovementSystem(World world, EventBus eventBus)
         {
@@ -23,14 +24,16 @@ namespace Game.Systems
 
         public void Update(World world, float deltaTime)
         {
-            // Movement is event driven; no per-frame logic required here.
+            // Store server delta time so that MoveCommand processing can
+            // apply speed consistently each frame.
+            _deltaTime = deltaTime;
         }
 
         private void OnMoveCommand(MoveCommand command)
         {
             if (_world.TryGetComponent(command.Entity, out PositionComponent position))
             {
-                position.Value += command.Direction.normalized * command.Speed;
+                position.Value += command.Direction.normalized * command.Speed * _deltaTime;
                 _world.SetComponent(command.Entity, position);
                 _eventBus.Publish(new PositionChangedEvent(command.Entity, position.Value));
             }
