@@ -30,7 +30,7 @@ namespace Game.Infrastructure
             stream.ReadBytes(bytes);
             var json = Encoding.UTF8.GetString(bytes.ToArray());
             var move = JsonUtility.FromJson<MoveCommand>(json);
-            if (move != null)
+            if (!move.Equals(default(MoveCommand)))
             {
                 _eventBus.Publish(move);
             }
