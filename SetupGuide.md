@@ -37,7 +37,7 @@ Place the provided `.cs` files into their matching folders.
    - `ServerCommandDispatcher`
    - `MovementSystem`
    - `ReplicationSystem`
-4. Open **File → Build Settings** and enable **Server Build** to produce a headless executable.
+4. Open **File → Build Settings** and enable **Dedicated Server/Server Build** to produce a headless executable. (Leave this unchecked for client builds.)
 
 ## 4. Client Scene
 1. Create a new scene for the client.
@@ -47,7 +47,10 @@ Place the provided `.cs` files into their matching folders.
    - `ClientSnapshotReceiver`
    - a player visual `Transform` used for rendering
    - `CameraFollow` on the main camera for top‑down tracking
-4. Add a `PlayerInput` component with an action **Move** bound to WASD/left stick and set it to call `ClientInputSender.OnMove`.
+4. Add a `PlayerInput` component:
+   - Create an **Input Actions** asset with an action map `Gameplay` and a `Vector2` action **Move** bound to WASD/left stick.
+   - In `PlayerInput`, assign this asset and choose **Invoke Unity Events**.
+   - Under **Move (performed)**, hook up `ClientInputSender → OnMove`.
 5. The client only renders state and sends input; all gameplay logic runs on the server.
 
 ## 5. Running on One Machine
