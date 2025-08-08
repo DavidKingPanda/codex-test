@@ -3,7 +3,7 @@ using System.Text.Json;
 using Game.Networking;
 using Game.Networking.Messages;
 using Unity.Collections;
-
+using Unity.Networking.Transport;
 using UnityEngine;
 
 namespace Game.Infrastructure
@@ -25,12 +25,11 @@ namespace Game.Infrastructure
 
         private void OnDataReceived(DataStreamReader stream)
         {
-            var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
+            using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
             var json = Encoding.UTF8.GetString(bytes.ToArray());
-            bytes.Dispose();
             var snapshot = JsonSerializer.Deserialize<PositionSnapshot>(json);
-            if (snapshot.EntityId == 0 && playerVisual != null)
+            if (snapshot != null && playerVisual != null && snapshot.EntityId == 0)
             {
                 playerVisual.position = snapshot.Position;
             }
