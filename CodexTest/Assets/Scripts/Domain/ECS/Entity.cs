@@ -1,8 +1,11 @@
+using System;
+
 namespace Game.Domain.ECS
 {
     /// <summary>
     /// Represents a unique identifier of an entity in the ECS world.
     /// </summary>
+    [Serializable]
     public readonly struct Entity
     {
         public readonly int Id;

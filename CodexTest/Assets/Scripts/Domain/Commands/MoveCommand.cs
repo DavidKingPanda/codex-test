@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Game.Domain.ECS;
 
@@ -6,6 +7,7 @@ namespace Game.Domain.Commands
     /// <summary>
     /// Command sent by client to request entity movement.
     /// </summary>
+    [Serializable]
     public readonly struct MoveCommand
     {
         public readonly Entity Entity;
