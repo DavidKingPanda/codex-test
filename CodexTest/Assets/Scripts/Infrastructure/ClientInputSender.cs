@@ -48,8 +48,12 @@ namespace Game.Infrastructure
             if (_input == Vector2.zero)
                 return;
 
-            var direction = new Vector3(input.x, 0f, input.y);
-            var command = new MoveCommand(PlayerEntity, direction, moveSpeed * Time.deltaTime);
+            var direction = new Vector3(_input.x, 0f, _input.y);
+
+            // Client-side prediction so the player moves immediately while waiting for server snapshots.
+            transform.Translate(direction.normalized * moveSpeed * Time.deltaTime, Space.World);
+
+            var command = new MoveCommand(PlayerEntity, direction, moveSpeed);
             var payload = JsonUtility.ToJson(command);
             var message = new NetworkMessage(MessageType.MoveCommand, payload);
             networkManager.SendMessage(message);
