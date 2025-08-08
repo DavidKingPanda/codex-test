@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Unity.Collections;
 using Unity.Networking.Transport;
@@ -6,6 +7,7 @@ using UnityEngine;
 
 using Game.Domain.Commands;
 using Game.Networking;
+using Game.Networking.Messages;
 
 namespace Game.Infrastructure
 {
@@ -16,12 +18,21 @@ namespace Game.Infrastructure
     {
         private readonly NetworkManager _networkManager;
         private readonly EventBus _eventBus;
+        private readonly Dictionary<MessageType, Action<string>> _handlers = new();
 
         public ServerCommandDispatcher(NetworkManager networkManager, EventBus eventBus)
         {
             _networkManager = networkManager;
             _eventBus = eventBus;
             _networkManager.OnData += OnDataReceived;
+            _handlers[MessageType.MoveCommand] = payload =>
+            {
+                var cmd = JsonUtility.FromJson<MoveCommand>(payload);
+                if (!cmd.Equals(default(MoveCommand)))
+                {
+                    _eventBus.Publish(cmd);
+                }
+            };
         }
 
         private void OnDataReceived(DataStreamReader stream)
@@ -29,10 +40,10 @@ namespace Game.Infrastructure
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
             var json = Encoding.UTF8.GetString(bytes.ToArray());
-            var move = JsonUtility.FromJson<MoveCommand>(json);
-            if (!move.Equals(default(MoveCommand)))
+            var message = JsonUtility.FromJson<NetworkMessage>(json);
+            if (_handlers.TryGetValue(message.Type, out var handler))
             {
-                _eventBus.Publish(move);
+                handler(message.Payload);
             }
         }
 

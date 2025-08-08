@@ -3,6 +3,7 @@ using Game.Domain.Events;
 using Game.Networking;
 using Game.Networking.Messages;
 using Game.Infrastructure;
+using UnityEngine;
 
 namespace Game.Systems
 {
@@ -29,7 +30,9 @@ namespace Game.Systems
         private void OnPositionChanged(PositionChangedEvent evt)
         {
             var snapshot = new PositionSnapshot(evt.Entity, evt.Position);
-            _networkManager.SendMessage(snapshot);
+            var payload = JsonUtility.ToJson(snapshot);
+            var message = new NetworkMessage(MessageType.PositionSnapshot, payload);
+            _networkManager.SendMessage(message);
         }
     }
 }

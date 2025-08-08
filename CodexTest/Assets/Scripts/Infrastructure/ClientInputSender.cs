@@ -1,6 +1,7 @@
 using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Networking;
+using Game.Networking.Messages;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -39,7 +40,9 @@ namespace Game.Infrastructure
 
             var direction = new Vector3(input.x, 0f, input.y);
             var command = new MoveCommand(PlayerEntity, direction, moveSpeed * Time.deltaTime);
-            networkManager.SendMessage(command);
+            var payload = JsonUtility.ToJson(command);
+            var message = new NetworkMessage(MessageType.MoveCommand, payload);
+            networkManager.SendMessage(message);
         }
     }
 }
