@@ -1,6 +1,6 @@
 # Setup Guide
 
-This repository demonstrates a minimal server-authoritative ECS framework for **Unity 2022.3.33f1**. Follow these steps to set up the project and run both client and server on the same machine.
+This repository demonstrates a minimal server-authoritative ECS framework for **Unity 2022.3.33f1**. Follow these steps to set up the project and run both the headless server and client locally or across a LAN.
 
 ## 1. Install Unity Packages
 Open **Window → Package Manager** and install:
@@ -50,12 +50,18 @@ Place the provided `.cs` files into their matching folders.
 4. Add a `PlayerInput` component with an action **Move** bound to WASD/left stick and set it to call `ClientInputSender.OnMove`.
 5. The client only renders state and sends input; all gameplay logic runs on the server.
 
-## 5. Running Locally
+## 5. Running on One Machine
 1. Start the headless server build or play the server scene in the Editor.
-2. Play the client scene in the Editor or as a standalone build.
-3. Use `localhost` and the same port so both run on one machine.
+2. Play the client scene in the Editor or as a standalone build on the same computer.
+3. Use `localhost` and the same port for both processes.
 
-## 6. Project Overview
+## 6. Testing on a Local Network
+1. Build and run the headless server on one machine within your LAN.
+2. Determine its local IP address (for example, `192.168.x.x`).
+3. On another machine, run the client scene and configure it to connect to that IP and port.
+4. Ensure any firewalls allow traffic on the chosen port.
+
+## 7. Project Overview
 - **Domain/ECS** – core ECS types (`Entity`, `World`, `ISystem`, `IComponent`).
 - **Components** – data-only components such as `PositionComponent`.
 - **Systems** – server logic like `MovementSystem` responding to events.
