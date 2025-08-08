@@ -20,14 +20,14 @@ namespace Game.Networking
         public void StartClient(string address, ushort port)
         {
             _driver = NetworkDriver.Create();
-            var endpoint = NetworkEndPoint.Parse(address, port);
+            var endpoint = NetworkEndpoint.Parse(address, port);
             _connection = _driver.Connect(endpoint);
         }
 
         public void StartServer(ushort port)
         {
             _driver = NetworkDriver.Create();
-            var endpoint = NetworkEndPoint.AnyIpv4;
+            var endpoint = NetworkEndpoint.AnyIpv4;
             endpoint.Port = port;
             if (_driver.Bind(endpoint) != 0)
             {
