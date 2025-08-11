@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Unity.Collections;
 using Unity.Networking.Transport;
@@ -15,13 +16,19 @@ namespace Game.Networking
     {
         private NetworkDriver _driver;
         private NetworkConnection _connection;
-        public event Action<DataStreamReader> OnData;
+        private readonly List<NetworkConnection> _connections = new();
+        public bool IsServer { get; private set; }
+        public event Action<NetworkConnection> OnClientConnected;
+        public event Action<NetworkConnection> OnClientDisconnected;
+        public event Action<NetworkConnection, DataStreamReader> OnData;
 
         public void StartClient(string address, ushort port)
         {
             _driver = NetworkDriver.Create();
             var endpoint = NetworkEndpoint.Parse(address, port);
             _connection = _driver.Connect(endpoint);
+            _connections.Add(_connection);
+            IsServer = false;
         }
 
         public void StartServer(ushort port)
@@ -34,6 +41,7 @@ namespace Game.Networking
                 throw new Exception("Failed to bind to port" + port);
             }
             _driver.Listen();
+            IsServer = true;
         }
 
         public void Update()
@@ -42,17 +50,41 @@ namespace Game.Networking
                 return;
             _driver.ScheduleUpdate().Complete();
 
-            if (!_connection.IsCreated)
+            if (IsServer)
             {
-                // Accept incoming connection on the server.
-                var connection = _driver.Accept();
-                if (connection.IsCreated)
+                NetworkConnection connection;
+                while ((connection = _driver.Accept()).IsCreated)
                 {
-                    _connection = connection;
+                    _connections.Add(connection);
+                    OnClientConnected?.Invoke(connection);
+                }
+
+                for (int i = 0; i < _connections.Count; i++)
+                {
+                    if (!_connections[i].IsCreated)
+                        continue;
+                    DataStreamReader stream;
+                    NetworkEvent.Type cmd;
+                    while ((cmd = _driver.PopEventForConnection(_connections[i], out stream)) != NetworkEvent.Type.Empty)
+                    {
+                        if (cmd == NetworkEvent.Type.Data)
+                        {
+                            OnData?.Invoke(_connections[i], stream);
+                        }
+                        else if (cmd == NetworkEvent.Type.Disconnect)
+                        {
+                            OnClientDisconnected?.Invoke(_connections[i]);
+                            _connections[i] = default;
+                        }
+                    }
+                    if (!_connections[i].IsCreated)
+                    {
+                        _connections.RemoveAt(i);
+                        i--;
+                    }
                 }
             }
-
-            if (_connection.IsCreated)
+            else if (_connection.IsCreated)
             {
                 DataStreamReader stream;
                 NetworkEvent.Type cmd;
@@ -60,7 +92,7 @@ namespace Game.Networking
                 {
                     if (cmd == NetworkEvent.Type.Data)
                     {
-                        OnData?.Invoke(stream);
+                        OnData?.Invoke(_connection, stream);
                     }
                     else if (cmd == NetworkEvent.Type.Disconnect)
                     {
@@ -70,15 +102,30 @@ namespace Game.Networking
             }
         }
 
-        public void SendBytes(byte[] bytes)
+        private void SendBytes(NetworkConnection connection, byte[] bytes)
         {
-            if (!_connection.IsCreated)
+            if (!connection.IsCreated)
                 return;
             using var nativeArray = new NativeArray<byte>(bytes, Allocator.Temp);
-            if (_driver.BeginSend(_connection, out var writer) == 0)
+            if (_driver.BeginSend(connection, out var writer) == 0)
             {
                 writer.WriteBytes(nativeArray);
                 _driver.EndSend(writer);
+            }
+        }
+
+        public void SendBytes(byte[] bytes)
+        {
+            if (IsServer)
+            {
+                foreach (var conn in _connections)
+                {
+                    SendBytes(conn, bytes);
+                }
+            }
+            else
+            {
+                SendBytes(_connection, bytes);
             }
         }
 
