@@ -22,7 +22,8 @@ namespace Game.Infrastructure
             networkManager.OnData += OnDataReceived;
         }
 
-        private void OnDataReceived(int _, DataStreamReader stream)
+        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
+
         {
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);

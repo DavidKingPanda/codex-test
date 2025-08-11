@@ -5,6 +5,8 @@ using Game.Infrastructure;
 using Game.Networking;
 using Game.Systems;
 using Game.Domain.Events;
+using System.Collections.Generic;
+using Unity.Networking.Transport;
 using UnityEngine;
 
 namespace Game.Infrastructure
@@ -24,6 +26,7 @@ namespace Game.Infrastructure
         private JumpSystem jumpSystem;
         private ServerCommandDispatcher dispatcher;
         private CommandHandler commandHandler;
+        private Dictionary<NetworkConnection, Entity> connectionToEntity;
 
         private void Start()
         {
@@ -31,18 +34,27 @@ namespace Game.Infrastructure
             world = new World();
             networkManager = new NetworkManager();
             networkManager.StartServer(port);
+            connectionToEntity = new Dictionary<NetworkConnection, Entity>();
             networkManager.OnClientConnected += OnClientConnected;
             networkManager.OnClientDisconnected += OnClientDisconnected;
-            dispatcher = new ServerCommandDispatcher(networkManager, eventBus);
+            dispatcher = new ServerCommandDispatcher(networkManager, eventBus, connectionToEntity);
             movementSystem = new MovementSystem(world, eventBus);
             replicationSystem = new ReplicationSystem(networkManager, eventBus);
             jumpSystem = new JumpSystem(world, eventBus);
             commandHandler = new CommandHandler(eventBus);
+        }
 
-            // Spawn a single player entity at the origin.
-            var player = world.CreateEntity();
-            world.AddComponent(player, new PositionComponent { Value = Vector3.zero });
-            eventBus.Publish(new PositionChangedEvent(player, Vector3.zero));
+        private void OnClientConnected(NetworkConnection connection)
+        {
+            var entity = world.CreateEntity();
+            world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });
+            eventBus.Publish(new PositionChangedEvent(entity, Vector3.zero));
+            connectionToEntity[connection] = entity;
+        }
+
+        private void OnClientDisconnected(NetworkConnection connection)
+        {
+            connectionToEntity.Remove(connection);
         }
 
         private void Update()
@@ -61,6 +73,7 @@ namespace Game.Infrastructure
                 networkManager.OnClientDisconnected -= OnClientDisconnected;
                 networkManager.Dispose();
             }
+
         }
 
         private void OnClientConnected(int clientId)
