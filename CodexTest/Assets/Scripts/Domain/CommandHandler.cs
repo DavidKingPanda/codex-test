@@ -19,5 +19,10 @@ namespace Game.Domain
         {
             _eventBus.Publish(command);
         }
+
+        public void Handle(JumpCommand command)
+        {
+            _eventBus.Publish(command);
+        }
     }
 }

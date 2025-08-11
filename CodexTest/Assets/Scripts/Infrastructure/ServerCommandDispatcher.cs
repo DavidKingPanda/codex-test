@@ -33,6 +33,14 @@ namespace Game.Infrastructure
                     _eventBus.Publish(cmd);
                 }
             };
+            _handlers[MessageType.JumpCommand] = payload =>
+            {
+                var cmd = JsonUtility.FromJson<JumpCommand>(payload);
+                if (!cmd.Equals(default(JumpCommand)))
+                {
+                    _eventBus.Publish(cmd);
+                }
+            };
         }
 
         private void OnDataReceived(DataStreamReader stream)

@@ -36,6 +36,7 @@ Place the provided `.cs` files into their matching folders.
    - `NetworkManager` (`StartServer(port)`)
    - `ServerCommandDispatcher`
    - `MovementSystem`
+   - `JumpSystem`
    - `ReplicationSystem`
 4. Open **File → Build Settings** and enable **Dedicated Server/Server Build** to produce a headless executable. (Leave this unchecked for client builds.)
 
@@ -48,9 +49,12 @@ Place the provided `.cs` files into their matching folders.
    - a player visual `Transform` used for rendering
    - `CameraFollow` on the main camera for top‑down tracking
 4. Add a `PlayerInput` component:
-   - Create an **Input Actions** asset with an action map `Gameplay` and a `Vector2` action **Move** bound to WASD/left stick.
+   - Create an **Input Actions** asset with an action map `Gameplay` containing:
+     - a `Vector2` action **Move** bound to WASD/left stick,
+     - a `Button` action **Jump** bound to Space.
    - In `PlayerInput`, assign this asset and choose **Invoke Unity Events**.
    - Under **Move (performed)**, hook up `ClientInputSender → OnMove`.
+   - Under **Jump (performed)**, hook up `ClientInputSender → OnJump`.
 5. The client only renders state and sends input; all gameplay logic runs on the server.
 
 ## 5. Running on One Machine
@@ -67,7 +71,7 @@ Place the provided `.cs` files into their matching folders.
 ## 7. Project Overview
 - **Domain/ECS** – core ECS types (`Entity`, `World`, `ISystem`, `IComponent`).
 - **Components** – data-only components such as `PositionComponent`.
-- **Systems** – server logic like `MovementSystem` responding to events.
+- **Systems** – server logic like `MovementSystem` and `JumpSystem` responding to events.
 - **Networking** – `NetworkManager` wrapper around Unity Transport.
 - **Infrastructure** – glue code (`EventBus`, `ClientInputSender`, `ServerCommandDispatcher`, `ClientBootstrap`, `ServerBootstrap`).
 - **Presentation** – visuals and camera scripts (`CameraFollow`).

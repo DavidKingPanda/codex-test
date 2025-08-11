@@ -5,7 +5,8 @@ namespace Game.Networking.Messages
     public enum MessageType
     {
         MoveCommand = 1,
-        PositionSnapshot = 2
+        PositionSnapshot = 2,
+        JumpCommand = 3
     }
 
     /// <summary>
