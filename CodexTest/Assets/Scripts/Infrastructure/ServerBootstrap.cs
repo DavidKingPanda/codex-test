@@ -21,6 +21,7 @@ namespace Game.Infrastructure
         private NetworkManager networkManager;
         private MovementSystem movementSystem;
         private ReplicationSystem replicationSystem;
+        private JumpSystem jumpSystem;
         private ServerCommandDispatcher dispatcher;
         private CommandHandler commandHandler;
 
@@ -33,6 +34,7 @@ namespace Game.Infrastructure
             dispatcher = new ServerCommandDispatcher(networkManager, eventBus);
             movementSystem = new MovementSystem(world, eventBus);
             replicationSystem = new ReplicationSystem(networkManager, eventBus);
+            jumpSystem = new JumpSystem(world, eventBus);
             commandHandler = new CommandHandler(eventBus);
 
             // Spawn a single player entity at the origin.
@@ -46,6 +48,7 @@ namespace Game.Infrastructure
             networkManager.Update();
             movementSystem.Update(world, Time.deltaTime);
             replicationSystem.Update(world, Time.deltaTime);
+            jumpSystem.Update(world, Time.deltaTime);
         }
 
         private void OnDestroy()

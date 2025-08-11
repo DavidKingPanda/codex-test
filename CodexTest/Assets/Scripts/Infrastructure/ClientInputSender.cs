@@ -14,7 +14,10 @@ namespace Game.Infrastructure
     {
         private NetworkManager networkManager;
         [SerializeField] private float moveSpeed = 5f;
+        [SerializeField] private float jumpForce = 5f;
+        [SerializeField] private float gravity = -9.81f;
         private Vector2 _input;
+        private float _verticalVelocity;
         public Entity PlayerEntity { get; private set; }
 
         /// <summary>
@@ -43,20 +46,49 @@ namespace Game.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Called when the Jump action is triggered.
+        /// Sends a jump command to the server and applies local prediction.
+        /// </summary>
+        public void OnJump(InputAction.CallbackContext context)
+        {
+            if (context.performed && Mathf.Abs(_verticalVelocity) < 0.01f)
+            {
+                _verticalVelocity = jumpForce;
+                var command = new JumpCommand(PlayerEntity, jumpForce);
+                var payload = JsonUtility.ToJson(command);
+                var message = new NetworkMessage(MessageType.JumpCommand, payload);
+                networkManager.SendMessage(message);
+            }
+        }
+
         private void Update()
         {
-            if (_input == Vector2.zero)
-                return;
+            if (_input != Vector2.zero)
+            {
+                var direction = new Vector3(_input.x, 0f, _input.y);
 
-            var direction = new Vector3(_input.x, 0f, _input.y);
+                // Client-side prediction for horizontal movement.
+                transform.Translate(direction.normalized * moveSpeed * Time.deltaTime, Space.World);
 
-            // Client-side prediction so the player moves immediately while waiting for server snapshots.
-            transform.Translate(direction.normalized * moveSpeed * Time.deltaTime, Space.World);
+                var command = new MoveCommand(PlayerEntity, direction, moveSpeed);
+                var payload = JsonUtility.ToJson(command);
+                var message = new NetworkMessage(MessageType.MoveCommand, payload);
+                networkManager.SendMessage(message);
+            }
 
-            var command = new MoveCommand(PlayerEntity, direction, moveSpeed);
-            var payload = JsonUtility.ToJson(command);
-            var message = new NetworkMessage(MessageType.MoveCommand, payload);
-            networkManager.SendMessage(message);
+            if (_verticalVelocity != 0f || transform.position.y > 0f)
+            {
+                _verticalVelocity += gravity * Time.deltaTime;
+                var pos = transform.position;
+                pos.y += _verticalVelocity * Time.deltaTime;
+                if (pos.y < 0f)
+                {
+                    pos.y = 0f;
+                    _verticalVelocity = 0f;
+                }
+                transform.position = pos;
+            }
         }
     }
 }
