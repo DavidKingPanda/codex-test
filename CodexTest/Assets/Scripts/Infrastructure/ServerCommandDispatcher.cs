@@ -18,32 +18,34 @@ namespace Game.Infrastructure
     {
         private readonly NetworkManager _networkManager;
         private readonly EventBus _eventBus;
-        private readonly Dictionary<MessageType, Action<string>> _handlers = new();
+        private readonly Dictionary<MessageType, Action<int, string>> _handlers = new();
 
         public ServerCommandDispatcher(NetworkManager networkManager, EventBus eventBus)
         {
             _networkManager = networkManager;
             _eventBus = eventBus;
             _networkManager.OnData += OnDataReceived;
-            _handlers[MessageType.MoveCommand] = payload =>
+            _handlers[MessageType.MoveCommand] = (id, payload) =>
             {
                 var cmd = JsonUtility.FromJson<MoveCommand>(payload);
                 if (!cmd.Equals(default(MoveCommand)))
                 {
-                    _eventBus.Publish(cmd);
+                    var serverCmd = new MoveCommand(id, cmd.Entity, cmd.Direction, cmd.Speed);
+                    _eventBus.Publish(serverCmd);
                 }
             };
-            _handlers[MessageType.JumpCommand] = payload =>
+            _handlers[MessageType.JumpCommand] = (id, payload) =>
             {
                 var cmd = JsonUtility.FromJson<JumpCommand>(payload);
                 if (!cmd.Equals(default(JumpCommand)))
                 {
-                    _eventBus.Publish(cmd);
+                    var serverCmd = new JumpCommand(id, cmd.Entity, cmd.Force);
+                    _eventBus.Publish(serverCmd);
                 }
             };
         }
 
-        private void OnDataReceived(DataStreamReader stream)
+        private void OnDataReceived(int clientId, DataStreamReader stream)
         {
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
@@ -51,7 +53,7 @@ namespace Game.Infrastructure
             var message = JsonUtility.FromJson<NetworkMessage>(json);
             if (_handlers.TryGetValue(message.Type, out var handler))
             {
-                handler(message.Payload);
+                handler(clientId, message.Payload);
             }
         }
 

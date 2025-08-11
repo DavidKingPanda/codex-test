@@ -12,9 +12,18 @@ namespace Game.Domain.Commands
     {
         public readonly Entity Entity;
         public readonly float Force;
+        public readonly int ClientId;
 
         public JumpCommand(Entity entity, float force)
         {
+            Entity = entity;
+            Force = force;
+            ClientId = 0;
+        }
+
+        public JumpCommand(int clientId, Entity entity, float force)
+        {
+            ClientId = clientId;
             Entity = entity;
             Force = force;
         }

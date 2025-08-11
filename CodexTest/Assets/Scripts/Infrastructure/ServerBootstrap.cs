@@ -31,6 +31,8 @@ namespace Game.Infrastructure
             world = new World();
             networkManager = new NetworkManager();
             networkManager.StartServer(port);
+            networkManager.OnClientConnected += OnClientConnected;
+            networkManager.OnClientDisconnected += OnClientDisconnected;
             dispatcher = new ServerCommandDispatcher(networkManager, eventBus);
             movementSystem = new MovementSystem(world, eventBus);
             replicationSystem = new ReplicationSystem(networkManager, eventBus);
@@ -53,7 +55,22 @@ namespace Game.Infrastructure
 
         private void OnDestroy()
         {
-            networkManager?.Dispose();
+            if (networkManager != null)
+            {
+                networkManager.OnClientConnected -= OnClientConnected;
+                networkManager.OnClientDisconnected -= OnClientDisconnected;
+                networkManager.Dispose();
+            }
+        }
+
+        private void OnClientConnected(int clientId)
+        {
+            Debug.Log($"Client {clientId} connected");
+        }
+
+        private void OnClientDisconnected(int clientId)
+        {
+            Debug.Log($"Client {clientId} disconnected");
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Unity.Collections;
 using Unity.Networking.Transport;
@@ -14,19 +15,27 @@ namespace Game.Networking
     public class NetworkManager : IDisposable
     {
         private NetworkDriver _driver;
-        private NetworkConnection _connection;
-        public event Action<DataStreamReader> OnData;
+        private NativeList<NetworkConnection> _connections;
+        private readonly Dictionary<int, int> _connectionIdMap = new();
+        private int _nextClientId = 1;
+        public event Action<int, DataStreamReader> OnData;
+        public event Action<int> OnClientConnected;
+        public event Action<int> OnClientDisconnected;
 
         public void StartClient(string address, ushort port)
         {
             _driver = NetworkDriver.Create();
+            _connections = new NativeList<NetworkConnection>(1, Allocator.Persistent);
             var endpoint = NetworkEndpoint.Parse(address, port);
-            _connection = _driver.Connect(endpoint);
+            var connection = _driver.Connect(endpoint);
+            _connections.Add(connection);
+            _connectionIdMap[connection.InternalId] = 0;
         }
 
         public void StartServer(ushort port)
         {
             _driver = NetworkDriver.Create();
+            _connections = new NativeList<NetworkConnection>(16, Allocator.Persistent);
             var endpoint = NetworkEndpoint.AnyIpv4;
             endpoint.Port = port;
             if (_driver.Bind(endpoint) != 0)
@@ -42,43 +51,58 @@ namespace Game.Networking
                 return;
             _driver.ScheduleUpdate().Complete();
 
-            if (!_connection.IsCreated)
+            // Accept incoming connections on the server.
+            NetworkConnection connection;
+            while ((connection = _driver.Accept()).IsCreated)
             {
-                // Accept incoming connection on the server.
-                var connection = _driver.Accept();
-                if (connection.IsCreated)
-                {
-                    _connection = connection;
-                }
+                var clientId = _nextClientId++;
+                _connections.Add(connection);
+                _connectionIdMap[connection.InternalId] = clientId;
+                OnClientConnected?.Invoke(clientId);
             }
 
-            if (_connection.IsCreated)
+            for (int i = 0; i < _connections.Length; i++)
             {
+                if (!_connections[i].IsCreated)
+                    continue;
                 DataStreamReader stream;
                 NetworkEvent.Type cmd;
-                while ((cmd = _driver.PopEventForConnection(_connection, out stream)) != NetworkEvent.Type.Empty)
+                while ((cmd = _driver.PopEventForConnection(_connections[i], out stream)) != NetworkEvent.Type.Empty)
                 {
+                    _connectionIdMap.TryGetValue(_connections[i].InternalId, out var clientId);
                     if (cmd == NetworkEvent.Type.Data)
                     {
-                        OnData?.Invoke(stream);
+                        OnData?.Invoke(clientId, stream);
                     }
                     else if (cmd == NetworkEvent.Type.Disconnect)
                     {
-                        _connection = default;
+                        OnClientDisconnected?.Invoke(clientId);
+                        _connectionIdMap.Remove(_connections[i].InternalId);
+                        _connections[i] = default;
                     }
+                }
+                if (!_connections[i].IsCreated)
+                {
+                    _connections.RemoveAtSwapBack(i);
+                    i--;
                 }
             }
         }
 
         public void SendBytes(byte[] bytes)
         {
-            if (!_connection.IsCreated)
+            if (_connections.Length == 0)
                 return;
             using var nativeArray = new NativeArray<byte>(bytes, Allocator.Temp);
-            if (_driver.BeginSend(_connection, out var writer) == 0)
+            for (int i = 0; i < _connections.Length; i++)
             {
-                writer.WriteBytes(nativeArray);
-                _driver.EndSend(writer);
+                if (!_connections[i].IsCreated)
+                    continue;
+                if (_driver.BeginSend(_connections[i], out var writer) == 0)
+                {
+                    writer.WriteBytes(nativeArray);
+                    _driver.EndSend(writer);
+                }
             }
         }
 
@@ -94,6 +118,11 @@ namespace Game.Networking
             {
                 _driver.Dispose();
             }
+            if (_connections.IsCreated)
+            {
+                _connections.Dispose();
+            }
+            _connectionIdMap.Clear();
         }
     }
 }
