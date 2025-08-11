@@ -73,6 +73,17 @@ namespace Game.Infrastructure
                 networkManager.OnClientDisconnected -= OnClientDisconnected;
                 networkManager.Dispose();
             }
+
+        }
+
+        private void OnClientConnected(int clientId)
+        {
+            Debug.Log($"Client {clientId} connected");
+        }
+
+        private void OnClientDisconnected(int clientId)
+        {
+            Debug.Log($"Client {clientId} disconnected");
         }
     }
 }

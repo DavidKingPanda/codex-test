@@ -22,6 +22,7 @@ namespace Game.Infrastructure
         private readonly Dictionary<NetworkConnection, Entity> _connectionToEntity;
         private readonly Dictionary<MessageType, Action<NetworkConnection, string>> _handlers = new();
 
+
         public ServerCommandDispatcher(
             NetworkManager networkManager,
             EventBus eventBus,
@@ -30,7 +31,9 @@ namespace Game.Infrastructure
             _networkManager = networkManager;
             _eventBus = eventBus;
             _connectionToEntity = connectionToEntity;
+
             _networkManager.OnData += OnDataReceived;
+
             _handlers[MessageType.MoveCommand] = (conn, payload) =>
             {
                 var cmd = JsonUtility.FromJson<MoveCommand>(payload);
@@ -40,6 +43,7 @@ namespace Game.Infrastructure
                     _eventBus.Publish(validated);
                 }
             };
+
             _handlers[MessageType.JumpCommand] = (conn, payload) =>
             {
                 var cmd = JsonUtility.FromJson<JumpCommand>(payload);

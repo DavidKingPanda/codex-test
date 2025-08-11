@@ -18,9 +18,19 @@ namespace Game.Domain.Commands
         /// Movement speed in units per second.
         /// </summary>
         public readonly float Speed;
+        public readonly int ClientId;
 
         public MoveCommand(Entity entity, Vector3 direction, float speed)
         {
+            Entity = entity;
+            Direction = direction;
+            Speed = speed;
+            ClientId = 0;
+        }
+
+        public MoveCommand(int clientId, Entity entity, Vector3 direction, float speed)
+        {
+            ClientId = clientId;
             Entity = entity;
             Direction = direction;
             Speed = speed;
