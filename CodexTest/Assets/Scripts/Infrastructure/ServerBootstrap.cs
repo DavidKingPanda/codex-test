@@ -5,7 +5,6 @@ using Game.Domain.Events;
 using Game.Networking;
 using Game.Networking.Messages;
 using Game.Systems;
-using Game.Domain.Events;
 using Game.Utils;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
@@ -32,6 +31,8 @@ namespace Game.Infrastructure
         private float tickAccumulator;
         private float fixedDeltaTime;
 
+        private bool _initialized;
+
         private void Start()
         {
             eventBus = new EventBus();
@@ -47,6 +48,7 @@ namespace Game.Infrastructure
             jumpSystem = new JumpSystem(world, eventBus);
             commandHandler = new CommandHandler(eventBus);
             fixedDeltaTime = 1f / Constants.ServerTickRate;
+            _initialized = true;
         }
 
         private void OnClientConnected(NetworkConnection connection)
@@ -69,6 +71,11 @@ namespace Game.Infrastructure
 
         private void Update()
         {
+            if (!_initialized || networkManager == null)
+            {
+                return;
+            }
+
             networkManager.Update();
             tickAccumulator += Time.deltaTime;
             while (tickAccumulator >= fixedDeltaTime)
@@ -88,16 +95,6 @@ namespace Game.Infrastructure
                 networkManager.OnClientDisconnected -= OnClientDisconnected;
                 networkManager.Dispose();
             }
-        }
-
-        private void OnClientConnected(int clientId)
-        {
-            Debug.Log($"Client {clientId} connected");
-        }
-
-        private void OnClientDisconnected(int clientId)
-        {
-            Debug.Log($"Client {clientId} disconnected");
         }
     }
 }
