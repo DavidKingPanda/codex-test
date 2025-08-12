@@ -68,7 +68,14 @@ Place the provided `.cs` files into their matching folders.
 3. On another machine, run the client scene and configure it to connect to that IP and port.
 4. Ensure any firewalls allow traffic on the chosen port.
 
-## 7. Project Overview
+## 7. Connecting over the Internet
+1. Make the server reachable from the Internet (configure port forwarding and firewalls so that port `7777` is open).
+2. Share the server's public IP address with remote testers.
+3. Run the client build with command line overrides: `MyGame.exe -server <public-ip> -port 7777`.
+   Alternatively, set environment variables `SERVER_ADDRESS` and `SERVER_PORT` before launching the client.
+4. The `NetworkLatencyLogger` component shows ping, allowing comparisons between different locations.
+
+## 8. Project Overview
 - **Domain/ECS** – core ECS types (`Entity`, `World`, `ISystem`, `IComponent`).
 - **Components** – data-only components such as `PositionComponent`.
 - **Systems** – server logic like `MovementSystem` and `JumpSystem` responding to events.

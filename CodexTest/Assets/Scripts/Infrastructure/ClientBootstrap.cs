@@ -25,6 +25,35 @@ namespace Game.Infrastructure
         private NetworkManager networkManager;
         private bool playerInitialized;
 
+        private void Awake()
+        {
+            // Allow overriding address/port via command line or environment variables.
+            var args = System.Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "-server" && i + 1 < args.Length)
+                {
+                    address = args[i + 1];
+                }
+                else if (args[i] == "-port" && i + 1 < args.Length && ushort.TryParse(args[i + 1], out var parsedPort))
+                {
+                    port = parsedPort;
+                }
+            }
+
+            var envAddress = System.Environment.GetEnvironmentVariable("SERVER_ADDRESS");
+            if (!string.IsNullOrWhiteSpace(envAddress))
+            {
+                address = envAddress;
+            }
+
+            var envPort = System.Environment.GetEnvironmentVariable("SERVER_PORT");
+            if (!string.IsNullOrWhiteSpace(envPort) && ushort.TryParse(envPort, out var envParsedPort))
+            {
+                port = envParsedPort;
+            }
+        }
+
         private void Start()
         {
             networkManager = new NetworkManager();
