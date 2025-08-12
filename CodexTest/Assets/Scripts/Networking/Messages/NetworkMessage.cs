@@ -7,7 +7,8 @@ namespace Game.Networking.Messages
         MoveCommand = 1,
         PositionSnapshot = 2,
         JumpCommand = 3,
-        SpawnPlayer = 4
+        SpawnPlayer = 4,
+        Ping = 5
     }
 
     /// <summary>

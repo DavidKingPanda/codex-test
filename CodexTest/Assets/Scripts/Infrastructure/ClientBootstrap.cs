@@ -20,6 +20,7 @@ namespace Game.Infrastructure
         [SerializeField] private Transform playerVisual;
         [SerializeField] private CameraFollow cameraFollow;
         [SerializeField] private ClientSnapshotReceiver snapshotReceiver;
+        [SerializeField] private NetworkLatencyLogger latencyLogger;
 
         private NetworkManager networkManager;
         private bool playerInitialized;
@@ -29,6 +30,10 @@ namespace Game.Infrastructure
             networkManager = new NetworkManager();
             networkManager.StartClient(address, port);
             networkManager.OnData += OnDataReceived;
+            if (latencyLogger != null)
+            {
+                latencyLogger.Initialize(networkManager);
+            }
         }
 
         private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
