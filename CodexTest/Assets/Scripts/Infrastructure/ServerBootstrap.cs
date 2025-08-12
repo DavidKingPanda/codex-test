@@ -1,8 +1,9 @@
 using Game.Components;
 using Game.Domain;
 using Game.Domain.ECS;
-using Game.Infrastructure;
+using Game.Domain.Events;
 using Game.Networking;
+using Game.Networking.Messages;
 using Game.Systems;
 using Game.Domain.Events;
 using System.Collections.Generic;
@@ -50,6 +51,11 @@ namespace Game.Infrastructure
             world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });
             eventBus.Publish(new PositionChangedEvent(entity, Vector3.zero));
             connectionToEntity[connection] = entity;
+
+            var spawn = new SpawnPlayer(entity);
+            var payload = JsonUtility.ToJson(spawn);
+            var message = new NetworkMessage(MessageType.SpawnPlayer, payload);
+            networkManager.SendMessage(connection, message);
         }
 
         private void OnClientDisconnected(NetworkConnection connection)
@@ -73,7 +79,6 @@ namespace Game.Infrastructure
                 networkManager.OnClientDisconnected -= OnClientDisconnected;
                 networkManager.Dispose();
             }
-
         }
 
         private void OnClientConnected(int clientId)
@@ -87,3 +92,4 @@ namespace Game.Infrastructure
         }
     }
 }
+

@@ -19,6 +19,12 @@ namespace Game.Networking
         public event Action<NetworkConnection> OnClientConnected;
         public event Action<NetworkConnection> OnClientDisconnected;
         public event Action<NetworkConnection, DataStreamReader> OnData;
+        /// <summary>
+        /// Indicates whether a connection is currently established.
+        /// </summary>
+        public bool IsConnected =>
+            _connections.IsCreated && _connections.Length > 0 && _connections[0].IsCreated;
+
 
         public void StartClient(string address, ushort port)
         {
@@ -118,6 +124,12 @@ namespace Game.Networking
             {
                 SendBytes(_connections[0], bytes);
             }
+        }
+
+        public void SendMessage<T>(NetworkConnection connection, T message)
+        {
+            var json = JsonUtility.ToJson(message);
+            SendBytes(connection, Encoding.UTF8.GetBytes(json));
         }
 
         public void SendMessage<T>(T message)

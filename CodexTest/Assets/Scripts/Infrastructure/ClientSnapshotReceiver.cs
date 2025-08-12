@@ -8,22 +8,27 @@ using UnityEngine;
 namespace Game.Infrastructure
 {
     /// <summary>
-    /// Receives position snapshots from the server and applies them to the player visual.
+    /// Receives position snapshots from the server and applies them to entity visuals.
     /// </summary>
     public class ClientSnapshotReceiver : MonoBehaviour
     {
         private NetworkManager networkManager;
-        private Transform playerVisual;
+        private Transform entityPrefab;
+        private readonly System.Collections.Generic.Dictionary<int, Transform> _entities = new();
 
-        public void Initialize(NetworkManager manager, Transform target)
+        public void Initialize(NetworkManager manager, Transform prefab)
         {
             networkManager = manager;
-            playerVisual = target;
+            entityPrefab = prefab;
             networkManager.OnData += OnDataReceived;
         }
 
-        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
+        public void RegisterEntity(int entityId, Transform transform)
+        {
+            _entities[entityId] = transform;
+        }
 
+        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
         {
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
@@ -34,10 +39,17 @@ namespace Game.Infrastructure
                 return;
 
             var snapshot = JsonUtility.FromJson<PositionSnapshot>(message.Payload);
-            if (!snapshot.Equals(default(PositionSnapshot)) && playerVisual != null && snapshot.EntityId == 0)
+            if (snapshot.Equals(default(PositionSnapshot)))
+                return;
+
+            if (!_entities.TryGetValue(snapshot.EntityId, out var visual))
             {
-                playerVisual.position = snapshot.Position;
+                if (entityPrefab == null)
+                    return;
+                visual = Instantiate(entityPrefab);
+                _entities[snapshot.EntityId] = visual;
             }
+            visual.position = snapshot.Position;
         }
 
         private void OnDestroy()
