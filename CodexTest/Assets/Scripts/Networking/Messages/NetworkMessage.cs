@@ -14,10 +14,10 @@ namespace Game.Networking.Messages
     /// Envelope for all network messages.
     /// </summary>
     [Serializable]
-    public readonly struct NetworkMessage
+    public struct NetworkMessage
     {
-        public readonly MessageType Type;
-        public readonly string Payload;
+        public MessageType Type;
+        public string Payload;
 
         public NetworkMessage(MessageType type, string payload)
         {

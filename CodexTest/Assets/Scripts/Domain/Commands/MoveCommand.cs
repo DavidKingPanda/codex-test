@@ -10,15 +10,15 @@ namespace Game.Domain.Commands
     /// in units per second.
     /// </summary>
     [Serializable]
-    public readonly struct MoveCommand
+    public struct MoveCommand
     {
-        public readonly Entity Entity;
-        public readonly Vector3 Direction;
+        public Entity Entity;
+        public Vector3 Direction;
         /// <summary>
         /// Movement speed in units per second.
         /// </summary>
-        public readonly float Speed;
-        public readonly int ClientId;
+        public float Speed;
+        public int ClientId;
 
         public MoveCommand(Entity entity, Vector3 direction, float speed)
         {
