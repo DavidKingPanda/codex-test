@@ -8,10 +8,10 @@ namespace Game.Networking.Messages
     /// Snapshot message sent from server to clients with entity position.
     /// </summary>
     [Serializable]
-    public readonly struct PositionSnapshot
+    public struct PositionSnapshot
     {
-        public readonly int EntityId;
-        public readonly Vector3 Position;
+        public int EntityId;
+        public Vector3 Position;
 
         public PositionSnapshot(Entity entity, Vector3 position)
         {

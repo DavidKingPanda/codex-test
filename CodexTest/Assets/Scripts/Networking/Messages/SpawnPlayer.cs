@@ -7,9 +7,9 @@ namespace Game.Networking.Messages
     /// Message sent from server to client to inform about the spawned player entity.
     /// </summary>
     [Serializable]
-    public readonly struct SpawnPlayer
+    public struct SpawnPlayer
     {
-        public readonly int EntityId;
+        public int EntityId;
 
         public SpawnPlayer(Entity entity)
         {

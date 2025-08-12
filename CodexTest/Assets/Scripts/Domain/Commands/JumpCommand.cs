@@ -8,11 +8,11 @@ namespace Game.Domain.Commands
     /// Force represents the initial upward velocity applied.
     /// </summary>
     [Serializable]
-    public readonly struct JumpCommand
+    public struct JumpCommand
     {
-        public readonly Entity Entity;
-        public readonly float Force;
-        public readonly int ClientId;
+        public Entity Entity;
+        public float Force;
+        public int ClientId;
 
         public JumpCommand(Entity entity, float force)
         {
