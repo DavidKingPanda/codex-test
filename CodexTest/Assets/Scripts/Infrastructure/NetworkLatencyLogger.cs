@@ -17,6 +17,11 @@ namespace Game.Infrastructure
         private float _timer;
 
         /// <summary>
+        /// Fired whenever a new round-trip time is measured.
+        /// </summary>
+        public event Action<long> OnPingUpdated;
+
+        /// <summary>
         /// Injects the network manager and subscribes to data events.
         /// </summary>
         public void Initialize(NetworkManager manager)
@@ -55,6 +60,7 @@ namespace Game.Infrastructure
             var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var rtt = now - ping.Timestamp;
             Debug.Log($"RTT: {rtt} ms");
+            OnPingUpdated?.Invoke(rtt);
         }
 
         private void OnDestroy()
