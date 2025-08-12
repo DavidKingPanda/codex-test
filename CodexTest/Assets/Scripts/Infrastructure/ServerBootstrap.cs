@@ -18,7 +18,7 @@ namespace Game.Infrastructure
     /// </summary>
     public class ServerBootstrap : MonoBehaviour
     {
-        [SerializeField] private ushort port = 7777;
+        [SerializeField] private ushort port = 80;
 
         private World world;
         private EventBus eventBus;
