@@ -53,6 +53,12 @@ namespace Game.Infrastructure
                     _eventBus.Publish(validated);
                 }
             };
+
+            _handlers[MessageType.Ping] = (conn, payload) =>
+            {
+                var message = new NetworkMessage(MessageType.Ping, payload);
+                _networkManager.SendMessage(conn, message);
+            };
         }
 
         private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
