@@ -15,7 +15,7 @@ namespace Game.Systems
     {
         private readonly World _world;
         private readonly EventBus _eventBus;
-        private float _deltaTime;
+        private float _fixedDeltaTime;
         private const float Gravity = -9.81f;
 
         public JumpSystem(World world, EventBus eventBus)
@@ -27,15 +27,15 @@ namespace Game.Systems
 
         public void Update(World world, float deltaTime)
         {
-            _deltaTime = deltaTime;
+            _fixedDeltaTime = deltaTime;
             var velocities = _world.View<VerticalVelocityComponent>().ToList();
             foreach (var (entity, vel) in velocities)
             {
                 var velocity = vel;
                 if (_world.TryGetComponent(entity, out PositionComponent position))
                 {
-                    velocity.Value += Gravity * _deltaTime;
-                    position.Value.y += velocity.Value * _deltaTime;
+                    velocity.Value += Gravity * _fixedDeltaTime;
+                    position.Value.y += velocity.Value * _fixedDeltaTime;
                     if (position.Value.y <= 0f)
                     {
                         position.Value.y = 0f;

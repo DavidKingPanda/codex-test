@@ -13,7 +13,7 @@ namespace Game.Systems
     {
         private readonly World _world;
         private readonly EventBus _eventBus;
-        private float _deltaTime;
+        private float _fixedDeltaTime;
 
         public MovementSystem(World world, EventBus eventBus)
         {
@@ -24,16 +24,16 @@ namespace Game.Systems
 
         public void Update(World world, float deltaTime)
         {
-            // Store server delta time so that MoveCommand processing can
-            // apply speed consistently each frame.
-            _deltaTime = deltaTime;
+            // Store the fixed server delta time so MoveCommand processing
+            // can apply speed consistently each tick.
+            _fixedDeltaTime = deltaTime;
         }
 
         private void OnMoveCommand(MoveCommand command)
         {
             if (_world.TryGetComponent(command.Entity, out PositionComponent position))
             {
-                position.Value += command.Direction.normalized * command.Speed * _deltaTime;
+                position.Value += command.Direction.normalized * command.Speed * _fixedDeltaTime;
                 _world.SetComponent(command.Entity, position);
                 _eventBus.Publish(new PositionChangedEvent(command.Entity, position.Value));
             }
