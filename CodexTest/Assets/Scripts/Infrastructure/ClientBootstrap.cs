@@ -15,7 +15,7 @@ namespace Game.Infrastructure
     public class ClientBootstrap : MonoBehaviour
     {
         [SerializeField] private string address = "127.0.0.1";
-        [SerializeField] private ushort port = 7777;
+        [SerializeField] private ushort port = 80;
         [SerializeField] private ClientInputSender inputSender;
         [SerializeField] private Transform playerVisual;
         [SerializeField] private CameraFollow cameraFollow;

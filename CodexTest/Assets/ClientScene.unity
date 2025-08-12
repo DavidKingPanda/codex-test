@@ -227,7 +227,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   address: 127.0.0.1
-  port: 7777
+  port: 80
   inputSender: {fileID: 75909471}
   playerVisual: {fileID: 826165231}
   cameraFollow: {fileID: 1666591920}
