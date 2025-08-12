@@ -6,6 +6,7 @@ using Game.Networking;
 using Game.Networking.Messages;
 using Game.Systems;
 using Game.Domain.Events;
+using Game.Utils;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
@@ -28,6 +29,8 @@ namespace Game.Infrastructure
         private ServerCommandDispatcher dispatcher;
         private CommandHandler commandHandler;
         private Dictionary<NetworkConnection, Entity> connectionToEntity;
+        private float tickAccumulator;
+        private float fixedDeltaTime;
 
         private void Start()
         {
@@ -43,6 +46,7 @@ namespace Game.Infrastructure
             replicationSystem = new ReplicationSystem(networkManager, eventBus);
             jumpSystem = new JumpSystem(world, eventBus);
             commandHandler = new CommandHandler(eventBus);
+            fixedDeltaTime = 1f / Constants.ServerTickRate;
         }
 
         private void OnClientConnected(NetworkConnection connection)
@@ -66,9 +70,14 @@ namespace Game.Infrastructure
         private void Update()
         {
             networkManager.Update();
-            movementSystem.Update(world, Time.deltaTime);
-            replicationSystem.Update(world, Time.deltaTime);
-            jumpSystem.Update(world, Time.deltaTime);
+            tickAccumulator += Time.deltaTime;
+            while (tickAccumulator >= fixedDeltaTime)
+            {
+                movementSystem.Update(world, fixedDeltaTime);
+                replicationSystem.Update(world, fixedDeltaTime);
+                jumpSystem.Update(world, fixedDeltaTime);
+                tickAccumulator -= fixedDeltaTime;
+            }
         }
 
         private void OnDestroy()

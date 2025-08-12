@@ -2,6 +2,7 @@ using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Networking;
 using Game.Networking.Messages;
+using Game.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,6 +20,8 @@ namespace Game.Infrastructure
         private Vector2 _input;
         private float _verticalVelocity;
         private Transform _target;
+        private float _tickAccumulator;
+        private float _fixedDeltaTime;
         public Entity PlayerEntity { get; private set; }
 
         /// <summary>
@@ -29,6 +32,7 @@ namespace Game.Infrastructure
             networkManager = manager;
             PlayerEntity = playerEntity;
             _target = target;
+            _fixedDeltaTime = 1f / Constants.ServerTickRate;
         }
 
         /// <summary>
@@ -72,30 +76,36 @@ namespace Game.Infrastructure
             if (networkManager == null || !networkManager.IsConnected || _target == null)
                 return;
 
-            if (_input != Vector2.zero)
+            _tickAccumulator += Time.deltaTime;
+            while (_tickAccumulator >= _fixedDeltaTime)
             {
-                var direction = new Vector3(_input.x, 0f, _input.y);
-
-                // Client-side prediction for horizontal movement.
-                _target.Translate(direction.normalized * moveSpeed * Time.deltaTime, Space.World);
-
-                var command = new MoveCommand(PlayerEntity, direction, moveSpeed);
-                var payload = JsonUtility.ToJson(command);
-                var message = new NetworkMessage(MessageType.MoveCommand, payload);
-                networkManager.SendMessage(message);
-            }
-
-            if (_verticalVelocity != 0f || _target.position.y > 0f)
-            {
-                _verticalVelocity += gravity * Time.deltaTime;
-                var pos = _target.position;
-                pos.y += _verticalVelocity * Time.deltaTime;
-                if (pos.y < 0f)
+                if (_input != Vector2.zero)
                 {
-                    pos.y = 0f;
-                    _verticalVelocity = 0f;
+                    var direction = new Vector3(_input.x, 0f, _input.y);
+
+                    // Client-side prediction for horizontal movement.
+                    _target.Translate(direction.normalized * moveSpeed * _fixedDeltaTime, Space.World);
+
+                    var command = new MoveCommand(PlayerEntity, direction, moveSpeed);
+                    var payload = JsonUtility.ToJson(command);
+                    var message = new NetworkMessage(MessageType.MoveCommand, payload);
+                    networkManager.SendMessage(message);
                 }
-                _target.position = pos;
+
+                if (_verticalVelocity != 0f || _target.position.y > 0f)
+                {
+                    _verticalVelocity += gravity * _fixedDeltaTime;
+                    var pos = _target.position;
+                    pos.y += _verticalVelocity * _fixedDeltaTime;
+                    if (pos.y < 0f)
+                    {
+                        pos.y = 0f;
+                        _verticalVelocity = 0f;
+                    }
+                    _target.position = pos;
+                }
+
+                _tickAccumulator -= _fixedDeltaTime;
             }
         }
     }
