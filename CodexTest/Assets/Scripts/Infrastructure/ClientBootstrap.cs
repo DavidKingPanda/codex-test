@@ -42,7 +42,10 @@ namespace Game.Infrastructure
 
             var spawn = JsonUtility.FromJson<SpawnPlayer>(message.Payload);
             var entity = new Entity(spawn.EntityId);
-            inputSender.Initialize(networkManager, entity);
+            if (inputSender != null)
+            {
+                inputSender.Initialize(networkManager, entity, playerVisual);
+            }
             snapshotReceiver.Initialize(networkManager, playerVisual);
             snapshotReceiver.RegisterEntity(entity.Id, playerVisual);
             if (cameraFollow != null && playerVisual != null)
