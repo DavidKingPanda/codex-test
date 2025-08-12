@@ -5,6 +5,7 @@ using Game.Domain.Events;
 using Game.Networking;
 using Game.Networking.Messages;
 using Game.Systems;
+using Game.Domain.Events;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
@@ -78,6 +79,16 @@ namespace Game.Infrastructure
                 networkManager.OnClientDisconnected -= OnClientDisconnected;
                 networkManager.Dispose();
             }
+        }
+
+        private void OnClientConnected(int clientId)
+        {
+            Debug.Log($"Client {clientId} connected");
+        }
+
+        private void OnClientDisconnected(int clientId)
+        {
+            Debug.Log($"Client {clientId} disconnected");
         }
     }
 }
