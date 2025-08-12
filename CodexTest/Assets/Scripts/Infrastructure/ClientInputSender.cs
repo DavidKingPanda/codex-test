@@ -18,15 +18,17 @@ namespace Game.Infrastructure
         [SerializeField] private float gravity = -9.81f;
         private Vector2 _input;
         private float _verticalVelocity;
+        private Transform _target;
         public Entity PlayerEntity { get; private set; }
 
         /// <summary>
         /// Injects dependencies from ClientBootstrap.
         /// </summary>
-        public void Initialize(NetworkManager manager, Entity playerEntity)
+        public void Initialize(NetworkManager manager, Entity playerEntity, Transform target)
         {
             networkManager = manager;
             PlayerEntity = playerEntity;
+            _target = target;
         }
 
         /// <summary>
@@ -52,10 +54,10 @@ namespace Game.Infrastructure
         /// </summary>
         public void OnJump(InputAction.CallbackContext context)
         {
-            if (networkManager == null || !networkManager.IsConnected)
+            if (networkManager == null || !networkManager.IsConnected || _target == null)
                 return;
 
-            if (context.performed && Mathf.Abs(_verticalVelocity) < 0.01f)
+            if (context.performed && Mathf.Abs(_verticalVelocity) < 0.01f && _target.position.y <= 0f)
             {
                 _verticalVelocity = jumpForce;
                 var command = new JumpCommand(PlayerEntity, jumpForce);
@@ -67,7 +69,7 @@ namespace Game.Infrastructure
 
         private void Update()
         {
-            if (networkManager == null || !networkManager.IsConnected)
+            if (networkManager == null || !networkManager.IsConnected || _target == null)
                 return;
 
             if (_input != Vector2.zero)
@@ -75,7 +77,7 @@ namespace Game.Infrastructure
                 var direction = new Vector3(_input.x, 0f, _input.y);
 
                 // Client-side prediction for horizontal movement.
-                transform.Translate(direction.normalized * moveSpeed * Time.deltaTime, Space.World);
+                _target.Translate(direction.normalized * moveSpeed * Time.deltaTime, Space.World);
 
                 var command = new MoveCommand(PlayerEntity, direction, moveSpeed);
                 var payload = JsonUtility.ToJson(command);
@@ -83,17 +85,17 @@ namespace Game.Infrastructure
                 networkManager.SendMessage(message);
             }
 
-            if (_verticalVelocity != 0f || transform.position.y > 0f)
+            if (_verticalVelocity != 0f || _target.position.y > 0f)
             {
                 _verticalVelocity += gravity * Time.deltaTime;
-                var pos = transform.position;
+                var pos = _target.position;
                 pos.y += _verticalVelocity * Time.deltaTime;
                 if (pos.y < 0f)
                 {
                     pos.y = 0f;
                     _verticalVelocity = 0f;
                 }
-                transform.position = pos;
+                _target.position = pos;
             }
         }
     }
