@@ -6,6 +6,7 @@ using Unity.Networking.Transport;
 using UnityEngine;
 
 using Game.Domain.Commands;
+using Game.Domain.ECS;
 using Game.Networking;
 using Game.Networking.Messages;
 
@@ -18,32 +19,43 @@ namespace Game.Infrastructure
     {
         private readonly NetworkManager _networkManager;
         private readonly EventBus _eventBus;
-        private readonly Dictionary<MessageType, Action<string>> _handlers = new();
+        private readonly Dictionary<NetworkConnection, Entity> _connectionToEntity;
+        private readonly Dictionary<MessageType, Action<NetworkConnection, string>> _handlers = new();
 
-        public ServerCommandDispatcher(NetworkManager networkManager, EventBus eventBus)
+
+        public ServerCommandDispatcher(
+            NetworkManager networkManager,
+            EventBus eventBus,
+            Dictionary<NetworkConnection, Entity> connectionToEntity)
         {
             _networkManager = networkManager;
             _eventBus = eventBus;
+            _connectionToEntity = connectionToEntity;
+
             _networkManager.OnData += OnDataReceived;
-            _handlers[MessageType.MoveCommand] = payload =>
+
+            _handlers[MessageType.MoveCommand] = (conn, payload) =>
             {
                 var cmd = JsonUtility.FromJson<MoveCommand>(payload);
-                if (!cmd.Equals(default(MoveCommand)))
+                if (!cmd.Equals(default(MoveCommand)) && _connectionToEntity.TryGetValue(conn, out var entity))
                 {
-                    _eventBus.Publish(cmd);
+                    var validated = new MoveCommand(entity, cmd.Direction, cmd.Speed);
+                    _eventBus.Publish(validated);
                 }
             };
-            _handlers[MessageType.JumpCommand] = payload =>
+
+            _handlers[MessageType.JumpCommand] = (conn, payload) =>
             {
                 var cmd = JsonUtility.FromJson<JumpCommand>(payload);
-                if (!cmd.Equals(default(JumpCommand)))
+                if (!cmd.Equals(default(JumpCommand)) && _connectionToEntity.TryGetValue(conn, out var entity))
                 {
-                    _eventBus.Publish(cmd);
+                    var validated = new JumpCommand(entity, cmd.Force);
+                    _eventBus.Publish(validated);
                 }
             };
         }
 
-        private void OnDataReceived(DataStreamReader stream)
+        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
         {
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
@@ -51,7 +63,7 @@ namespace Game.Infrastructure
             var message = JsonUtility.FromJson<NetworkMessage>(json);
             if (_handlers.TryGetValue(message.Type, out var handler))
             {
-                handler(message.Payload);
+                handler(connection, message.Payload);
             }
         }
 
@@ -61,3 +73,4 @@ namespace Game.Infrastructure
         }
     }
 }
+

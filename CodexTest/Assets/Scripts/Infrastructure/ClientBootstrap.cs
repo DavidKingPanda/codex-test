@@ -1,5 +1,9 @@
 using Game.Domain.ECS;
 using Game.Networking;
+using Game.Networking.Messages;
+using System.Text;
+using Unity.Collections;
+using Unity.Networking.Transport;
 using Game.Presentation;
 using UnityEngine;
 
@@ -18,19 +22,35 @@ namespace Game.Infrastructure
         [SerializeField] private ClientSnapshotReceiver snapshotReceiver;
 
         private NetworkManager networkManager;
+        private bool playerInitialized;
 
         private void Start()
         {
             networkManager = new NetworkManager();
             networkManager.StartClient(address, port);
+            networkManager.OnData += OnDataReceived;
+        }
 
-            var playerEntity = new Entity(0); // Match server-spawned entity ID
-            inputSender.Initialize(networkManager, playerEntity);
+        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
+        {
+            using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
+            stream.ReadBytes(bytes);
+            var json = Encoding.UTF8.GetString(bytes.ToArray());
+            var message = JsonUtility.FromJson<NetworkMessage>(json);
+            if (message.Type != MessageType.SpawnPlayer || playerInitialized)
+                return;
+
+            var spawn = JsonUtility.FromJson<SpawnPlayer>(message.Payload);
+            var entity = new Entity(spawn.EntityId);
+            inputSender.Initialize(networkManager, entity);
             snapshotReceiver.Initialize(networkManager, playerVisual);
+            snapshotReceiver.RegisterEntity(entity.Id, playerVisual);
             if (cameraFollow != null && playerVisual != null)
             {
                 cameraFollow.SetTarget(playerVisual);
             }
+
+            playerInitialized = true;
         }
 
         private void Update()
@@ -40,7 +60,11 @@ namespace Game.Infrastructure
 
         private void OnDestroy()
         {
-            networkManager?.Dispose();
+            if (networkManager != null)
+            {
+                networkManager.OnData -= OnDataReceived;
+                networkManager.Dispose();
+            }
         }
     }
 }

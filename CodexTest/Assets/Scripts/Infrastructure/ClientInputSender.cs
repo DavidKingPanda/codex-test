@@ -52,6 +52,9 @@ namespace Game.Infrastructure
         /// </summary>
         public void OnJump(InputAction.CallbackContext context)
         {
+            if (networkManager == null || !networkManager.IsConnected)
+                return;
+
             if (context.performed && Mathf.Abs(_verticalVelocity) < 0.01f)
             {
                 _verticalVelocity = jumpForce;
@@ -64,6 +67,9 @@ namespace Game.Infrastructure
 
         private void Update()
         {
+            if (networkManager == null || !networkManager.IsConnected)
+                return;
+
             if (_input != Vector2.zero)
             {
                 var direction = new Vector3(_input.x, 0f, _input.y);
