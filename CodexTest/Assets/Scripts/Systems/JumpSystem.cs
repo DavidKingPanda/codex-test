@@ -3,6 +3,7 @@ using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Domain.Events;
 using Game.Infrastructure;
+using System.Linq;
 using UnityEngine;
 
 namespace Game.Systems
@@ -27,7 +28,8 @@ namespace Game.Systems
         public void Update(World world, float deltaTime)
         {
             _deltaTime = deltaTime;
-            foreach (var (entity, vel) in _world.View<VerticalVelocityComponent>())
+            var velocities = _world.View<VerticalVelocityComponent>().ToList();
+            foreach (var (entity, vel) in velocities)
             {
                 var velocity = vel;
                 if (_world.TryGetComponent(entity, out PositionComponent position))
