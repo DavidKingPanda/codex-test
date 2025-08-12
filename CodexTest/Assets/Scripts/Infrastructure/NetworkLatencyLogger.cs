@@ -40,7 +40,7 @@ namespace Game.Infrastructure
             {
                 _timer = 0f;
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                var ping = new Ping(timestamp);
+                var ping = new Game.Networking.Messages.Ping(timestamp);
                 var payload = JsonUtility.ToJson(ping);
                 var message = new NetworkMessage(MessageType.Ping, payload);
                 _networkManager.SendMessage(message);
@@ -56,7 +56,7 @@ namespace Game.Infrastructure
             if (message.Type != MessageType.Ping)
                 return;
 
-            var ping = JsonUtility.FromJson<Ping>(message.Payload);
+            var ping = JsonUtility.FromJson<Game.Networking.Messages.Ping>(message.Payload);
             var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var rtt = now - ping.Timestamp;
             Debug.Log($"RTT: {rtt} ms");
