@@ -16,6 +16,7 @@ namespace Game.Presentation
 
         private Vector3 baseOffset;
         private Vector3 dragOffset;
+        private Vector3 previousMousePosition;
         private Quaternion _initialRotation;
 
         private void Awake()
@@ -28,11 +29,15 @@ namespace Game.Presentation
         {
             if (target == null) return;
 
+            if (Input.GetMouseButtonDown(1))
+            {
+                previousMousePosition = Input.mousePosition;
+            }
+
             if (Input.GetMouseButton(1))
             {
-                Vector2 mouse = Input.mousePosition;
-                Vector2 screenSize = new Vector2(Screen.width, Screen.height);
-                Vector2 normalized = ((mouse / screenSize) - new Vector2(0.5f, 0.5f)) * 2f;
+                Vector3 mouse = Input.mousePosition;
+                Vector3 delta = mouse - previousMousePosition;
 
                 Vector3 right = _initialRotation * Vector3.right;
                 Vector3 forward = _initialRotation * Vector3.forward;
@@ -41,8 +46,10 @@ namespace Game.Presentation
                 right.Normalize();
                 forward.Normalize();
 
-                Vector3 drag = (normalized.x * right + normalized.y * forward) * dragSensitivity;
-                dragOffset = Vector3.ClampMagnitude(drag, maxDragDistance);
+                dragOffset += (delta.x * right + delta.y * forward) * dragSensitivity;
+                dragOffset = Vector3.ClampMagnitude(dragOffset, maxDragDistance);
+
+                previousMousePosition = mouse;
             }
             else
             {
