@@ -81,7 +81,14 @@ namespace Game.Infrastructure
             {
                 if (_input != Vector2.zero)
                 {
-                    var direction = new Vector3(_input.x, 0f, _input.y);
+                    Transform cam = Camera.main.transform;
+                    Vector3 camForward = cam.forward;
+                    camForward.y = 0f;
+                    camForward.Normalize();
+                    Vector3 camRight = cam.right;
+                    camRight.y = 0f;
+                    camRight.Normalize();
+                    var direction = camRight * _input.x + camForward * _input.y;
 
                     // Client-side prediction for horizontal movement.
                     _target.Translate(direction.normalized * moveSpeed * _fixedDeltaTime, Space.World);

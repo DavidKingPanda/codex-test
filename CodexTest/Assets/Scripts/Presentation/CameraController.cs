@@ -68,6 +68,11 @@ namespace Game.Presentation
 
             Vector3 hoverOffset = (normalized.x * right + normalized.y * forward) * hoverSensitivity;
 
+            if (Input.GetMouseButton(2))
+            {
+                hoverOffset = Vector3.zero;
+            }
+
             if (Input.GetMouseButton(1))
             {
                 Vector3 drag = (normalized.x * right + normalized.y * forward) * dragSensitivity;
@@ -80,9 +85,7 @@ namespace Game.Presentation
 
             dragOffset = Vector3.Lerp(dragOffset, targetDragOffset, followSpeed * Time.deltaTime);
 
-            var desired = target.position + yawRotation * baseOffset + hoverOffset + dragOffset; // rotate offset only around Y
-            transform.position = Vector3.Lerp(transform.position, desired, followSpeed * Time.deltaTime);
-
+            transform.position = target.position + yawRotation * baseOffset + hoverOffset + dragOffset;
             transform.rotation = rotation;
         }
 
