@@ -248,7 +248,7 @@ MonoBehaviour:
   port: 80
   inputSender: {fileID: 75909471}
   playerVisual: {fileID: 826165231}
-  cameraFollow: {fileID: 1666591920}
+  cameraController: {fileID: 1666591920}
   snapshotReceiver: {fileID: 75909470}
   latencyLogger: {fileID: 1800000000}
 --- !u!4 &75909473
@@ -508,7 +508,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1666591916}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2726c9907b3bf6f4c9b4162328ac503f, type: 3}
+  m_Script: {fileID: 11500000, guid: 767007e9dd7b4d62a18c9e30751e105d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 826165231}
