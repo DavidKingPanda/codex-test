@@ -52,7 +52,8 @@ namespace Game.Presentation
                 previousMousePosition = currentMouse;
             }
 
-            var rotation = Quaternion.Euler(0f, _yaw, 0f) * _initialRotation;
+            var yawRotation = Quaternion.Euler(0f, _yaw, 0f);
+            var rotation = yawRotation * _initialRotation; // preserve pitch while rotating around target
 
             Vector2 mouse = Input.mousePosition;
             Vector2 screenSize = new Vector2(Screen.width, Screen.height);
@@ -79,7 +80,7 @@ namespace Game.Presentation
 
             dragOffset = Vector3.Lerp(dragOffset, targetDragOffset, followSpeed * Time.deltaTime);
 
-            var desired = target.position + rotation * baseOffset + hoverOffset + dragOffset;
+            var desired = target.position + yawRotation * baseOffset + hoverOffset + dragOffset; // rotate offset only around Y
             transform.position = Vector3.Lerp(transform.position, desired, followSpeed * Time.deltaTime);
 
             transform.rotation = rotation;
@@ -96,8 +97,9 @@ namespace Game.Presentation
             targetDragOffset = Vector3.zero;
             dragOffset = Vector3.zero;
 
-            var rotation = Quaternion.Euler(0f, _yaw, 0f) * _initialRotation;
-            var desired = target.position + rotation * baseOffset;
+            var yawRotation = Quaternion.Euler(0f, _yaw, 0f);
+            var rotation = yawRotation * _initialRotation; // preserve pitch
+            var desired = target.position + yawRotation * baseOffset; // offset unaffected by pitch
             transform.SetPositionAndRotation(desired, rotation);
         }
     }
