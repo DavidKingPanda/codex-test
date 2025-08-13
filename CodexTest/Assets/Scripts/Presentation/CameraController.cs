@@ -41,10 +41,10 @@ namespace Game.Presentation
 
             if (Input.GetMouseButton(2))
             {
-                Vector3 mouse = Input.mousePosition;
-                float deltaX = mouse.x - previousMousePosition.x;
+                Vector3 currentMouse = Input.mousePosition;
+                float deltaX = currentMouse.x - previousMousePosition.x;
                 _yaw += deltaX * orbitSensitivity;
-                previousMousePosition = mouse;
+                previousMousePosition = currentMouse;
             }
 
             var rotation = Quaternion.Euler(0f, _yaw, 0f) * _initialRotation;
