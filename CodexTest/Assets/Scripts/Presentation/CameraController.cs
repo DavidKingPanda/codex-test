@@ -11,15 +11,17 @@ namespace Game.Presentation
         [SerializeField] private Transform target;
         [SerializeField] private Vector3 offset = new Vector3(0f, 10f, -10f);
         [SerializeField] private float followSpeed = 5f;
-        [SerializeField] private float dragSensitivity = 0.5f;
+        [SerializeField] private float dragSensitivity = 5f;
         [SerializeField] private float maxDragDistance = 5f;
 
         private Vector3 baseOffset;
         private Vector3 dragOffset;
+        private Quaternion _initialRotation;
 
         private void Awake()
         {
             baseOffset = offset;
+            _initialRotation = transform.rotation;
         }
 
         private void LateUpdate()
@@ -28,22 +30,28 @@ namespace Game.Presentation
 
             if (Input.GetMouseButton(1))
             {
-                float h = -Input.GetAxis("Mouse X") * dragSensitivity;
-                float v = -Input.GetAxis("Mouse Y") * dragSensitivity;
-                var delta = new Vector3(h, 0f, v);
+                Vector2 mouse = Input.mousePosition;
+                Vector2 screenSize = new Vector2(Screen.width, Screen.height);
+                Vector2 normalized = (mouse / screenSize) - new Vector2(0.5f, 0.5f);
 
-                dragOffset += delta;
-                dragOffset = Vector3.ClampMagnitude(dragOffset, maxDragDistance);
-                transform.position = target.position + baseOffset + dragOffset;
+                Vector3 right = _initialRotation * Vector3.right;
+                Vector3 forward = _initialRotation * Vector3.forward;
+                right.y = 0f;
+                forward.y = 0f;
+                right.Normalize();
+                forward.Normalize();
+
+                Vector3 offset = (-normalized.x * right + -normalized.y * forward) * dragSensitivity;
+                dragOffset = Vector3.ClampMagnitude(offset, maxDragDistance);
             }
             else
             {
                 dragOffset = Vector3.Lerp(dragOffset, Vector3.zero, followSpeed * Time.deltaTime);
-                var desired = target.position + baseOffset + dragOffset;
-                transform.position = Vector3.Lerp(transform.position, desired, followSpeed * Time.deltaTime);
             }
 
-            transform.LookAt(target);
+            var desired = target.position + baseOffset + dragOffset;
+            transform.position = Vector3.Lerp(transform.position, desired, followSpeed * Time.deltaTime);
+            transform.rotation = _initialRotation;
         }
 
         public void SetTarget(Transform newTarget)
