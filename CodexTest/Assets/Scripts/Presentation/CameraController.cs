@@ -16,10 +16,12 @@ namespace Game.Presentation
 
         private Vector3 baseOffset;
         private Vector3 dragOffset;
+        private Quaternion _initialRotation;
 
         private void Awake()
         {
             baseOffset = offset;
+            _initialRotation = transform.rotation;
         }
 
         private void LateUpdate()
@@ -43,7 +45,7 @@ namespace Game.Presentation
                 transform.position = Vector3.Lerp(transform.position, desired, followSpeed * Time.deltaTime);
             }
 
-            transform.LookAt(target);
+            transform.rotation = _initialRotation;
         }
 
         public void SetTarget(Transform newTarget)
