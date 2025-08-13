@@ -18,7 +18,7 @@ namespace Game.Infrastructure
         [SerializeField] private ushort port = 80;
         [SerializeField] private ClientInputSender inputSender;
         [SerializeField] private Transform playerVisual;
-        [SerializeField] private CameraFollow cameraFollow;
+        [SerializeField] private CameraController cameraController;
         [SerializeField] private ClientSnapshotReceiver snapshotReceiver;
         [SerializeField] private NetworkLatencyLogger latencyLogger;
 
@@ -82,9 +82,9 @@ namespace Game.Infrastructure
             }
             snapshotReceiver.Initialize(networkManager, playerVisual);
             snapshotReceiver.RegisterEntity(entity.Id, playerVisual);
-            if (cameraFollow != null && playerVisual != null)
+            if (cameraController != null && playerVisual != null)
             {
-                cameraFollow.SetTarget(playerVisual);
+                cameraController.SetTarget(playerVisual);
             }
 
             playerInitialized = true;
