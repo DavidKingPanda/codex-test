@@ -32,7 +32,7 @@ namespace Game.Presentation
             {
                 Vector2 mouse = Input.mousePosition;
                 Vector2 screenSize = new Vector2(Screen.width, Screen.height);
-                Vector2 normalized = (mouse / screenSize) - new Vector2(0.5f, 0.5f);
+                Vector2 normalized = ((mouse / screenSize) - new Vector2(0.5f, 0.5f)) * 2f;
 
                 Vector3 right = _initialRotation * Vector3.right;
                 Vector3 forward = _initialRotation * Vector3.forward;
@@ -41,8 +41,8 @@ namespace Game.Presentation
                 right.Normalize();
                 forward.Normalize();
 
-                Vector3 offset = (-normalized.x * right + -normalized.y * forward) * dragSensitivity;
-                dragOffset = Vector3.ClampMagnitude(offset, maxDragDistance);
+                Vector3 drag = (normalized.x * right + normalized.y * forward) * dragSensitivity;
+                dragOffset = Vector3.ClampMagnitude(drag, maxDragDistance);
             }
             else
             {
