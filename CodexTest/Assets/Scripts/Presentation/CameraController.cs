@@ -28,6 +28,11 @@ namespace Game.Presentation
         {
             baseOffset = offset;
             _initialRotation = transform.rotation;
+
+            if (target != null)
+            {
+                SetTarget(target);
+            }
         }
 
         private void LateUpdate()
@@ -83,6 +88,17 @@ namespace Game.Presentation
         public void SetTarget(Transform newTarget)
         {
             target = newTarget;
+            if (target == null)
+            {
+                return;
+            }
+
+            targetDragOffset = Vector3.zero;
+            dragOffset = Vector3.zero;
+
+            var rotation = Quaternion.Euler(0f, _yaw, 0f) * _initialRotation;
+            var desired = target.position + rotation * baseOffset;
+            transform.SetPositionAndRotation(desired, rotation);
         }
     }
 }
