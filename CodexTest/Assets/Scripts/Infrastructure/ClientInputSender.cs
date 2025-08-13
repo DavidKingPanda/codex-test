@@ -14,7 +14,8 @@ namespace Game.Infrastructure
     public class ClientInputSender : MonoBehaviour
     {
         private NetworkManager networkManager;
-        [SerializeField] private float moveSpeed = 5f;
+        [SerializeField] private float walkSpeed = 2f;
+        [SerializeField] private float runSpeed = 5f;
         [SerializeField] private float jumpForce = 5f;
         [SerializeField] private float gravity = -9.81f;
         private Vector2 _input;
@@ -90,10 +91,13 @@ namespace Game.Infrastructure
                     camRight.Normalize();
                     var direction = camRight * _input.x + camForward * _input.y;
 
-                    // Client-side prediction for horizontal movement.
-                    _target.Translate(direction.normalized * moveSpeed * _fixedDeltaTime, Space.World);
+                    bool isRunning = !Mouse.current.rightButton.isPressed;
+                    float speed = isRunning ? runSpeed : walkSpeed;
 
-                    var command = new MoveCommand(PlayerEntity, direction, moveSpeed);
+                    // Client-side prediction for horizontal movement.
+                    _target.Translate(direction.normalized * speed * _fixedDeltaTime, Space.World);
+
+                    var command = new MoveCommand(PlayerEntity, direction, speed, isRunning);
                     var payload = JsonUtility.ToJson(command);
                     var message = new NetworkMessage(MessageType.MoveCommand, payload);
                     networkManager.SendMessage(message);

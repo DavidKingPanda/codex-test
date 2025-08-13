@@ -18,22 +18,28 @@ namespace Game.Domain.Commands
         /// Movement speed in units per second.
         /// </summary>
         public float Speed;
+        /// <summary>
+        /// True if the player intends to run.
+        /// </summary>
+        public bool IsRunning;
         public int ClientId;
 
-        public MoveCommand(Entity entity, Vector3 direction, float speed)
+        public MoveCommand(Entity entity, Vector3 direction, float speed, bool isRunning)
         {
             Entity = entity;
             Direction = direction;
             Speed = speed;
+            IsRunning = isRunning;
             ClientId = 0;
         }
 
-        public MoveCommand(int clientId, Entity entity, Vector3 direction, float speed)
+        public MoveCommand(int clientId, Entity entity, Vector3 direction, float speed, bool isRunning)
         {
             ClientId = clientId;
             Entity = entity;
             Direction = direction;
             Speed = speed;
+            IsRunning = isRunning;
         }
     }
 }
