@@ -51,6 +51,7 @@ namespace Game.Presentation
 
             var desired = target.position + baseOffset + dragOffset;
             transform.position = Vector3.Lerp(transform.position, desired, followSpeed * Time.deltaTime);
+
             transform.rotation = _initialRotation;
         }
 
