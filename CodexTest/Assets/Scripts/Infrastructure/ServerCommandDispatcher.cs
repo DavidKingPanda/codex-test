@@ -39,7 +39,7 @@ namespace Game.Infrastructure
                 var cmd = JsonUtility.FromJson<MoveCommand>(payload);
                 if (!cmd.Equals(default(MoveCommand)) && _connectionToEntity.TryGetValue(conn, out var entity))
                 {
-                    var validated = new MoveCommand(entity, cmd.Direction, cmd.Speed);
+                    var validated = new MoveCommand(entity, cmd.Direction, cmd.Speed, cmd.IsRunning);
                     _eventBus.Publish(validated);
                 }
             };
