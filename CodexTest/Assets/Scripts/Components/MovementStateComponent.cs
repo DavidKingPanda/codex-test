@@ -1,4 +1,5 @@
 using System;
+using Game.Domain.ECS;
 
 namespace Game.Components
 {
@@ -6,7 +7,7 @@ namespace Game.Components
     /// Stores current movement state such as running or walking.
     /// </summary>
     [Serializable]
-    public struct MovementStateComponent
+    public struct MovementStateComponent : IComponent
     {
         public bool IsRunning;
     }
