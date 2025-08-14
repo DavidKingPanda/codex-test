@@ -1,5 +1,5 @@
 using Game.Domain.Commands;
-using Game.Infrastructure;
+using Game.EventBus;
 
 namespace Game.Domain
 {

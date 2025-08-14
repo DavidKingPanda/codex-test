@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Game.Infrastructure
+namespace Game.EventBus
 {
     /// <summary>
     /// Simple event bus for decoupled communication between systems.

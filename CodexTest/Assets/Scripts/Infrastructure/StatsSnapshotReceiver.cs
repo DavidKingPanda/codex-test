@@ -1,7 +1,7 @@
 using System.Text;
 using Game.Domain.Events;
 using Game.Domain.ECS;
-using Game.Infrastructure;
+using Game.EventBus;
 using Game.Networking;
 using Game.Networking.Messages;
 using Unity.Collections;

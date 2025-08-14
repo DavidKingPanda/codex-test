@@ -5,6 +5,7 @@ using System.Text;
 using Unity.Collections;
 using Unity.Networking.Transport;
 using Game.Presentation;
+using Game.EventBus;
 using UnityEngine;
 
 namespace Game.Infrastructure
