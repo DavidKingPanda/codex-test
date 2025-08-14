@@ -1,6 +1,6 @@
 {
-  "name": "Tests",
-  "references": ["Game.Domain", "Game.Components", "Game.Systems", "Game.Infrastructure"],
+  "name": "Game.Systems",
+  "references": ["Game.Domain", "Game.Components", "Game.Infrastructure"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
@@ -9,6 +9,5 @@
   "autoReferenced": true,
   "defineConstraints": [],
   "versionDefines": [],
-  "noEngineReferences": false,
-  "testAssemblies": true
+  "noEngineReferences": false
 }
