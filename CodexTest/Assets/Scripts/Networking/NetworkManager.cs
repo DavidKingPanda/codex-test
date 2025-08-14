@@ -13,12 +13,12 @@ namespace Game.Networking
     public class NetworkManager : IDisposable
     {
         private NetworkDriver _driver;
-        private NativeList<NetworkDriver.Connection> _connections;
+        private NativeList<NetworkConnection> _connections;
         public bool IsServer { get; private set; }
 
-        public event Action<NetworkDriver.Connection> OnClientConnected;
-        public event Action<NetworkDriver.Connection> OnClientDisconnected;
-        public event Action<NetworkDriver.Connection, DataStreamReader> OnData;
+        public event Action<NetworkConnection> OnClientConnected;
+        public event Action<NetworkConnection> OnClientDisconnected;
+        public event Action<NetworkConnection, DataStreamReader> OnData;
         /// <summary>
         /// Indicates whether a connection is currently established.
         /// </summary>
@@ -29,7 +29,7 @@ namespace Game.Networking
         public void StartClient(string address, ushort port)
         {
             _driver = NetworkDriver.Create();
-            _connections = new NativeList<NetworkDriver.Connection>(1, Allocator.Persistent);
+            _connections = new NativeList<NetworkConnection>(1, Allocator.Persistent);
             var endpoint = NetworkEndpoint.Parse(address, port);
             var connection = _driver.Connect(endpoint);
             _connections.Add(connection);
@@ -39,7 +39,7 @@ namespace Game.Networking
         public void StartServer(ushort port)
         {
             _driver = NetworkDriver.Create();
-            _connections = new NativeList<NetworkDriver.Connection>(16, Allocator.Persistent);
+            _connections = new NativeList<NetworkConnection>(16, Allocator.Persistent);
             var endpoint = NetworkEndpoint.AnyIpv4;
             endpoint.Port = port;
             if (_driver.Bind(endpoint) != 0)
@@ -59,7 +59,7 @@ namespace Game.Networking
 
             if (IsServer)
             {
-                NetworkDriver.Connection connection;
+                NetworkConnection connection;
                 while ((connection = _driver.Accept()).IsCreated)
                 {
                     _connections.Add(connection);
@@ -95,7 +95,7 @@ namespace Game.Networking
             }
         }
 
-        private void SendBytes(NetworkDriver.Connection connection, byte[] bytes)
+        private void SendBytes(NetworkConnection connection, byte[] bytes)
         {
             if (!connection.IsCreated)
                 return;
@@ -126,7 +126,7 @@ namespace Game.Networking
             }
         }
 
-        public void SendMessage<T>(NetworkDriver.Connection connection, T message)
+        public void SendMessage<T>(NetworkConnection connection, T message)
         {
             var json = JsonUtility.ToJson(message);
             SendBytes(connection, Encoding.UTF8.GetBytes(json));
