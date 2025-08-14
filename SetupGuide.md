@@ -40,7 +40,8 @@ Place the provided `.cs` files into their matching folders.
    - `ReplicationSystem`
    - `SurvivalSystem`
    - `SurvivalReplicationSystem`
-4. Open **File → Build Settings** and enable **Dedicated Server/Server Build** to produce a headless executable. (Leave this unchecked for client builds.)
+4. Create a **SurvivalConfig** asset (`Right Click → Create → Config → SurvivalConfig`) and assign it to `ServerBootstrap` to tweak starting stamina, hunger, drain, and regeneration rates.
+5. Open **File → Build Settings** and enable **Dedicated Server/Server Build** to produce a headless executable. (Leave this unchecked for client builds.)
 
 ## 4. Client Scene
 1. Create a new scene for the client.
@@ -59,6 +60,7 @@ Place the provided `.cs` files into their matching folders.
    - In `PlayerInput`, assign this asset and choose **Invoke Unity Events**.
    - Under **Move (performed)**, hook up `ClientInputSender → OnMove`.
    - Under **Jump (performed)**, hook up `ClientInputSender → OnJump`.
+   - The player walks by default; hold **Left Shift** to run. Stamina drains only while running.
 5. The client only renders state and sends input; all gameplay logic runs on the server.
 
 ## 5. Running on One Machine
