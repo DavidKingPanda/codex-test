@@ -8,7 +8,7 @@ using Game.Systems;
 using Game.Utils;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using UnityEngine;
 
 namespace Game.Infrastructure
@@ -23,7 +23,7 @@ namespace Game.Infrastructure
         [SerializeField] private MovementConfig movementConfig;
 
         private World world;
-        private EventBus eventBus;
+        private GameEventBus eventBus;
         private NetworkManager networkManager;
         private MovementSystem movementSystem;
         private ReplicationSystem replicationSystem;
@@ -40,7 +40,7 @@ namespace Game.Infrastructure
 
         private void Start()
         {
-            eventBus = new EventBus();
+            eventBus = new GameEventBus();
             world = new World();
             networkManager = new NetworkManager();
             networkManager.StartServer(port);

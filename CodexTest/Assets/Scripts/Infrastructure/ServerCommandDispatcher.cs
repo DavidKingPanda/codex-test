@@ -9,7 +9,7 @@ using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Networking;
 using Game.Networking.Messages;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 
 namespace Game.Infrastructure
 {
@@ -19,14 +19,14 @@ namespace Game.Infrastructure
     public class ServerCommandDispatcher : IDisposable
     {
         private readonly NetworkManager _networkManager;
-        private readonly EventBus _eventBus;
+        private readonly GameEventBus _eventBus;
         private readonly Dictionary<NetworkConnection, Entity> _connectionToEntity;
         private readonly Dictionary<MessageType, Action<NetworkConnection, string>> _handlers = new();
 
 
         public ServerCommandDispatcher(
             NetworkManager networkManager,
-            EventBus eventBus,
+            GameEventBus eventBus,
             Dictionary<NetworkConnection, Entity> connectionToEntity)
         {
             _networkManager = networkManager;

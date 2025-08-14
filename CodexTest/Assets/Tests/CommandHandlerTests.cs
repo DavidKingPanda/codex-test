@@ -1,7 +1,7 @@
 using Game.Domain;
 using Game.Domain.Commands;
 using Game.Domain.ECS;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -12,7 +12,7 @@ namespace Tests
         [Test]
         public void HandleMoveCommand_PublishesCommand()
         {
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var handler = new CommandHandler(eventBus);
             MoveCommand received = default;
             eventBus.Subscribe<MoveCommand>(cmd => received = cmd);
@@ -27,7 +27,7 @@ namespace Tests
         [Test]
         public void HandleJumpCommand_PublishesCommand()
         {
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var handler = new CommandHandler(eventBus);
             JumpCommand received = default;
             eventBus.Subscribe<JumpCommand>(cmd => received = cmd);

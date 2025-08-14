@@ -3,7 +3,7 @@ using Game.Components;
 using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Domain.Events;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using Game.Systems;
 using NUnit.Framework;
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace Tests
         public void MoveCommandUpdatesPositionAndState()
         {
             var world = new World();
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var system = new MovementSystem(world, eventBus);
             var entity = world.CreateEntity();
             world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });
@@ -41,7 +41,7 @@ namespace Tests
         public void MoveCommandWithoutStaminaFallsBackToWalk()
         {
             var world = new World();
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var system = new MovementSystem(world, eventBus);
             var entity = world.CreateEntity();
             world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });

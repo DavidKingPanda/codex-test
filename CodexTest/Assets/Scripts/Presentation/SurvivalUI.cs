@@ -1,5 +1,5 @@
 using Game.Domain.Events;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,9 +13,9 @@ namespace Game.Presentation
         [SerializeField] private Slider hungerBar;
         [SerializeField] private Slider staminaBar;
 
-        private EventBus _eventBus;
+        private GameEventBus _eventBus;
 
-        public void Initialize(EventBus eventBus)
+        public void Initialize(GameEventBus eventBus)
         {
             _eventBus = eventBus;
             _eventBus.Subscribe<HungerChangedEvent>(OnHungerChanged);

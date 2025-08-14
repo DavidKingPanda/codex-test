@@ -4,7 +4,7 @@ using Game.Domain.Events;
 using Game.Networking;
 using Game.Networking.Messages;
 using Game.Utils;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,7 +16,7 @@ namespace Game.Infrastructure
     public class ClientInputSender : MonoBehaviour
     {
         private NetworkManager networkManager;
-        private EventBus eventBus;
+        private GameEventBus eventBus;
         private float walkSpeed;
         private float runSpeed;
         [SerializeField] private float jumpForce = 5f;
@@ -32,7 +32,7 @@ namespace Game.Infrastructure
         /// <summary>
         /// Injects dependencies from ClientBootstrap.
         /// </summary>
-        public void Initialize(NetworkManager manager, EventBus eventBus, Entity playerEntity, Transform target, float walkSpeed, float runSpeed, float jumpForce, float gravity)
+        public void Initialize(NetworkManager manager, GameEventBus eventBus, Entity playerEntity, Transform target, float walkSpeed, float runSpeed, float jumpForce, float gravity)
         {
             networkManager = manager;
             this.eventBus = eventBus;

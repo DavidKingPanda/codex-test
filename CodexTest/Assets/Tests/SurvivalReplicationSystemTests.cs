@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Game.Domain.ECS;
 using Game.Domain.Events;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using Game.Networking;
 using Game.Networking.Messages;
 using Game.Systems;
@@ -28,7 +28,7 @@ namespace Tests
         public void StaminaChangedEvent_SendsSnapshotMessage()
         {
             var network = new TestNetworkManager();
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var system = new SurvivalReplicationSystem(network, eventBus);
 
             var entity = new Entity(10);
@@ -47,7 +47,7 @@ namespace Tests
         public void HungerChangedEvent_SendsSnapshotMessage()
         {
             var network = new TestNetworkManager();
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var system = new SurvivalReplicationSystem(network, eventBus);
 
             var entity = new Entity(11);

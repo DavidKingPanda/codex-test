@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Game.Components;
 using Game.Domain.ECS;
 using Game.Domain.Events;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using Game.Systems;
 using NUnit.Framework;
 
@@ -14,7 +14,7 @@ namespace Tests
         public void RunningDrainsStaminaAndStopsWhenEmpty()
         {
             var world = new World();
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var system = new SurvivalSystem(world, eventBus);
             var entity = world.CreateEntity();
             world.AddComponent(entity, new StaminaComponent { Current = 2f, Max = 5f, DrainPerSecond = 1f, RegenPerSecond = 1f });
@@ -34,7 +34,7 @@ namespace Tests
         public void StaminaRegeneratesWhenNotRunning()
         {
             var world = new World();
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var system = new SurvivalSystem(world, eventBus);
             var entity = world.CreateEntity();
             world.AddComponent(entity, new StaminaComponent { Current = 0f, Max = 5f, DrainPerSecond = 1f, RegenPerSecond = 2f });
@@ -51,7 +51,7 @@ namespace Tests
         public void HungerDecreasesOverTime()
         {
             var world = new World();
-            var eventBus = new EventBus();
+            var eventBus = new GameEventBus();
             var system = new SurvivalSystem(world, eventBus);
             var entity = world.CreateEntity();
             world.AddComponent(entity, new HungerComponent { Current = 5f, Max = 5f, DrainPerSecond = 1f });
