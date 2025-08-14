@@ -132,7 +132,7 @@ namespace Game.Networking
             SendBytes(connection, Encoding.UTF8.GetBytes(json));
         }
 
-        public void SendMessage<T>(T message)
+        public virtual void SendMessage<T>(T message)
         {
             var json = JsonUtility.ToJson(message);
             SendBytes(Encoding.UTF8.GetBytes(json));
