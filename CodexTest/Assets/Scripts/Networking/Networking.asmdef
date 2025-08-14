@@ -1,7 +1,9 @@
 {
   "name": "Game.Networking",
   "references": [
-    "Game.Domain"
+    "Game.Domain",
+    "Unity.Transport",
+    "Unity.Collections"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
