@@ -28,9 +28,14 @@ namespace Game.Networking
 
         public void StartClient(string address, ushort port)
         {
-            _driver = NetworkDriver.Create();
+            // Create driver with explicit settings to align with Transport 2.5+ API.
+            var settings = new NetworkSettings();
+            _driver = NetworkDriver.Create(settings);
+
             _connections = new NativeList<NetworkConnection>(1, Allocator.Persistent);
-            var endpoint = NetworkEndpoint.Parse(address, port);
+
+            // Explicitly parse IPv4 endpoint.
+            var endpoint = NetworkEndpoint.Parse(address, port, NetworkFamily.Ipv4);
             var connection = _driver.Connect(endpoint);
             _connections.Add(connection);
             IsServer = false;
@@ -38,10 +43,13 @@ namespace Game.Networking
 
         public void StartServer(ushort port)
         {
-            _driver = NetworkDriver.Create();
+            var settings = new NetworkSettings();
+            _driver = NetworkDriver.Create(settings);
+
             _connections = new NativeList<NetworkConnection>(16, Allocator.Persistent);
-            var endpoint = NetworkEndpoint.AnyIpv4;
-            endpoint.Port = port;
+
+            // Bind to any IPv4 endpoint, allowing dynamic port selection when port == 0.
+            var endpoint = NetworkEndpoint.AnyIpv4.WithPort(port);
             if (_driver.Bind(endpoint) != 0)
             {
                 throw new Exception("Failed to bind to port" + port);
@@ -101,7 +109,9 @@ namespace Game.Networking
                 return;
 
             using var nativeArray = new NativeArray<byte>(bytes, Allocator.Temp);
-            if (_driver.BeginSend(connection, out var writer) == 0)
+
+            // New API requires specifying a pipeline when beginning a send operation.
+            if (_driver.BeginSend(NetworkPipeline.Null, connection, out var writer) == 0)
             {
                 writer.WriteBytes(nativeArray);
                 _driver.EndSend(writer);
