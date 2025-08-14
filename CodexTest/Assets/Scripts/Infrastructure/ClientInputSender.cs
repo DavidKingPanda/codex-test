@@ -4,7 +4,7 @@ using Game.Domain.Events;
 using Game.Networking;
 using Game.Networking.Messages;
 using Game.Utils;
-using Game.EventBus;
+using EventBus = Game.EventBus.EventBus;
 using UnityEngine;
 using UnityEngine.InputSystem;
 

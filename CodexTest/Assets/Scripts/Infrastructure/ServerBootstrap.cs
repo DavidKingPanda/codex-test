@@ -8,7 +8,7 @@ using Game.Systems;
 using Game.Utils;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
-using Game.EventBus;
+using EventBus = Game.EventBus.EventBus;
 using UnityEngine;
 
 namespace Game.Infrastructure
