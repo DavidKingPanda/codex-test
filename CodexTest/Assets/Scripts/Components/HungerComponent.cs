@@ -1,4 +1,5 @@
 using System;
+using Game.Domain.ECS;
 
 namespace Game.Components
 {
@@ -6,7 +7,7 @@ namespace Game.Components
     /// Represents hunger decreasing over time.
     /// </summary>
     [Serializable]
-    public struct HungerComponent
+    public struct HungerComponent : IComponent
     {
         public float Current;
         public float Max;

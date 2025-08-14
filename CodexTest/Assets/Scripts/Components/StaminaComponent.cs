@@ -1,4 +1,5 @@
 using System;
+using Game.Domain.ECS;
 
 namespace Game.Components
 {
@@ -6,7 +7,7 @@ namespace Game.Components
     /// Represents stamina used for sprinting.
     /// </summary>
     [Serializable]
-    public struct StaminaComponent
+    public struct StaminaComponent : IComponent
     {
         public float Current;
         public float Max;
