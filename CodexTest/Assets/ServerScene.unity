@@ -149,10 +149,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e087988331ec72345b9d16622a067626, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   port: 80
-  survivalConfig: {fileID: 0}
+  survivalConfig: {fileID: 11400000, guid: ef94a616e1001f44397dc85fcdabd3b9, type: 2}
   movementConfig: {fileID: 11400000, guid: b0477a0cdef04660b8478bbf92888a5d, type: 2}
 --- !u!4 &683224130
 Transform:
