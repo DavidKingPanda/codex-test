@@ -18,6 +18,7 @@ namespace Game.Infrastructure
     public class ServerBootstrap : MonoBehaviour
     {
         [SerializeField] private ushort port = 80;
+        [SerializeField] private SurvivalConfig survivalConfig;
 
         private World world;
         private EventBus eventBus;
@@ -41,6 +42,10 @@ namespace Game.Infrastructure
             world = new World();
             networkManager = new NetworkManager();
             networkManager.StartServer(port);
+            if (survivalConfig == null)
+            {
+                survivalConfig = ScriptableObject.CreateInstance<SurvivalConfig>();
+            }
             connectionToEntity = new Dictionary<NetworkConnection, Entity>();
             networkManager.OnClientConnected += OnClientConnected;
             networkManager.OnClientDisconnected += OnClientDisconnected;
@@ -60,12 +65,23 @@ namespace Game.Infrastructure
             var entity = world.CreateEntity();
             world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });
             world.AddComponent(entity, new MovementSpeedComponent { WalkSpeed = 2f, RunSpeed = 4f });
-            world.AddComponent(entity, new StaminaComponent { Current = 100f, Max = 100f, DrainPerSecond = 10f, RegenPerSecond = 5f });
-            world.AddComponent(entity, new HungerComponent { Current = 100f, Max = 100f, DrainPerSecond = 1f });
+            world.AddComponent(entity, new StaminaComponent
+            {
+                Current = survivalConfig.MaxStamina,
+                Max = survivalConfig.MaxStamina,
+                DrainPerSecond = survivalConfig.StaminaDrainPerSecond,
+                RegenPerSecond = survivalConfig.StaminaRegenPerSecond
+            });
+            world.AddComponent(entity, new HungerComponent
+            {
+                Current = survivalConfig.MaxHunger,
+                Max = survivalConfig.MaxHunger,
+                DrainPerSecond = survivalConfig.HungerDrainPerSecond
+            });
             world.AddComponent(entity, new MovementStateComponent { IsRunning = false });
             eventBus.Publish(new PositionChangedEvent(entity, Vector3.zero));
-            eventBus.Publish(new StaminaChangedEvent(entity, 100f, 100f));
-            eventBus.Publish(new HungerChangedEvent(entity, 100f, 100f));
+            eventBus.Publish(new StaminaChangedEvent(entity, survivalConfig.MaxStamina, survivalConfig.MaxStamina));
+            eventBus.Publish(new HungerChangedEvent(entity, survivalConfig.MaxHunger, survivalConfig.MaxHunger));
             connectionToEntity[connection] = entity;
 
             var spawn = new SpawnPlayer(entity);

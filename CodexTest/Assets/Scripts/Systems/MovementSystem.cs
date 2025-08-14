@@ -36,8 +36,8 @@ namespace Game.Systems
                 return;
 
             // Determine movement mode based on stamina and desired state.
+            bool isRunning = command.IsRunning && command.Direction.sqrMagnitude > 0f;
             float speed = command.Speed;
-            bool isRunning = command.IsRunning;
 
             if (_world.TryGetComponent(command.Entity, out StaminaComponent stamina))
             {

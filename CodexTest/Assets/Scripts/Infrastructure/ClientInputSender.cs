@@ -15,7 +15,7 @@ namespace Game.Infrastructure
     {
         private NetworkManager networkManager;
         [SerializeField] private float walkSpeed = 2f;
-        [SerializeField] private float runSpeed = 5f;
+        [SerializeField] private float runSpeed = 4f;
         [SerializeField] private float jumpForce = 5f;
         [SerializeField] private float gravity = -9.81f;
         private Vector2 _input;
@@ -80,28 +80,32 @@ namespace Game.Infrastructure
             _tickAccumulator += Time.deltaTime;
             while (_tickAccumulator >= _fixedDeltaTime)
             {
+                Transform cam = Camera.main.transform;
+                Vector3 direction = Vector3.zero;
                 if (_input != Vector2.zero)
                 {
-                    Transform cam = Camera.main.transform;
                     Vector3 camForward = cam.forward;
                     camForward.y = 0f;
                     camForward.Normalize();
                     Vector3 camRight = cam.right;
                     camRight.y = 0f;
                     camRight.Normalize();
-                    var direction = camRight * _input.x + camForward * _input.y;
+                    direction = camRight * _input.x + camForward * _input.y;
+                }
 
-                    bool isRunning = !Mouse.current.rightButton.isPressed;
-                    float speed = isRunning ? runSpeed : walkSpeed;
+                bool isRunning = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed;
+                float speed = isRunning ? runSpeed : walkSpeed;
 
+                if (direction != Vector3.zero)
+                {
                     // Client-side prediction for horizontal movement.
                     _target.Translate(direction.normalized * speed * _fixedDeltaTime, Space.World);
-
-                    var command = new MoveCommand(PlayerEntity, direction, speed, isRunning);
-                    var payload = JsonUtility.ToJson(command);
-                    var message = new NetworkMessage(MessageType.MoveCommand, payload);
-                    networkManager.SendMessage(message);
                 }
+
+                var command = new MoveCommand(PlayerEntity, direction, speed, isRunning);
+                var payload = JsonUtility.ToJson(command);
+                var message = new NetworkMessage(MessageType.MoveCommand, payload);
+                networkManager.SendMessage(message);
 
                 if (_verticalVelocity != 0f || _target.position.y > 0f)
                 {
