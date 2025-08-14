@@ -32,7 +32,7 @@ namespace Game.Infrastructure
         private SurvivalReplicationSystem survivalReplicationSystem;
         private ServerCommandDispatcher dispatcher;
         private CommandHandler commandHandler;
-        private Dictionary<NetworkConnection, Entity> connectionToEntity;
+        private Dictionary<NetworkDriver.Connection, Entity> connectionToEntity;
         private float tickAccumulator;
         private float fixedDeltaTime;
 
@@ -52,7 +52,7 @@ namespace Game.Infrastructure
             {
                 movementConfig = ScriptableObject.CreateInstance<MovementConfig>();
             }
-            connectionToEntity = new Dictionary<NetworkConnection, Entity>();
+            connectionToEntity = new Dictionary<NetworkDriver.Connection, Entity>();
             networkManager.OnClientConnected += OnClientConnected;
             networkManager.OnClientDisconnected += OnClientDisconnected;
             dispatcher = new ServerCommandDispatcher(networkManager, eventBus, connectionToEntity);
@@ -66,7 +66,7 @@ namespace Game.Infrastructure
             _initialized = true;
         }
 
-        private void OnClientConnected(NetworkConnection connection)
+        private void OnClientConnected(NetworkDriver.Connection connection)
         {
             var entity = world.CreateEntity();
             world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });
@@ -106,7 +106,7 @@ namespace Game.Infrastructure
             networkManager.SendMessage(connection, message);
         }
 
-        private void OnClientDisconnected(NetworkConnection connection)
+        private void OnClientDisconnected(NetworkDriver.Connection connection)
         {
             connectionToEntity.Remove(connection);
         }
