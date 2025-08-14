@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WalkSpeed: 5
   RunSpeed: 15
+  JumpForce: 5
+  Gravity: -9.81

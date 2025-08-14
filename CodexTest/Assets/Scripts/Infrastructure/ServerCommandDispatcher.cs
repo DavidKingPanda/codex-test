@@ -49,7 +49,7 @@ namespace Game.Infrastructure
                 var cmd = JsonUtility.FromJson<JumpCommand>(payload);
                 if (!cmd.Equals(default(JumpCommand)) && _connectionToEntity.TryGetValue(conn, out var entity))
                 {
-                    var validated = new JumpCommand(entity, cmd.Force);
+                    var validated = new JumpCommand(entity);
                     _eventBus.Publish(validated);
                 }
             };

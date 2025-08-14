@@ -28,7 +28,7 @@ namespace Game.Infrastructure
         /// <summary>
         /// Injects dependencies from ClientBootstrap.
         /// </summary>
-        public void Initialize(NetworkManager manager, Entity playerEntity, Transform target, float walkSpeed, float runSpeed)
+        public void Initialize(NetworkManager manager, Entity playerEntity, Transform target, float walkSpeed, float runSpeed, float jumpForce, float gravity)
         {
             networkManager = manager;
             PlayerEntity = playerEntity;
@@ -36,6 +36,8 @@ namespace Game.Infrastructure
             _fixedDeltaTime = 1f / Constants.ServerTickRate;
             this.walkSpeed = walkSpeed;
             this.runSpeed = runSpeed;
+            this.jumpForce = jumpForce;
+            this.gravity = gravity;
         }
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace Game.Infrastructure
             if (context.performed && Mathf.Abs(_verticalVelocity) < 0.01f && _target.position.y <= 0f)
             {
                 _verticalVelocity = jumpForce;
-                var command = new JumpCommand(PlayerEntity, jumpForce);
+                var command = new JumpCommand(PlayerEntity);
                 var payload = JsonUtility.ToJson(command);
                 var message = new NetworkMessage(MessageType.JumpCommand, payload);
                 networkManager.SendMessage(message);

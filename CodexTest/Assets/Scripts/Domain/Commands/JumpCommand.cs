@@ -5,27 +5,23 @@ namespace Game.Domain.Commands
 {
     /// <summary>
     /// Command sent by client to request an entity jump.
-    /// Force represents the initial upward velocity applied.
     /// </summary>
     [Serializable]
     public struct JumpCommand
     {
         public Entity Entity;
-        public float Force;
         public int ClientId;
 
-        public JumpCommand(Entity entity, float force)
+        public JumpCommand(Entity entity)
         {
             Entity = entity;
-            Force = force;
             ClientId = 0;
         }
 
-        public JumpCommand(int clientId, Entity entity, float force)
+        public JumpCommand(int clientId, Entity entity)
         {
             ClientId = clientId;
             Entity = entity;
-            Force = force;
         }
     }
 }
