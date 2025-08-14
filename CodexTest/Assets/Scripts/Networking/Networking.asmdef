@@ -1,6 +1,8 @@
 {
   "name": "Game.Networking",
-  "references": [],
+  "references": [
+    "Game.Domain"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
