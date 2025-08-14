@@ -2,7 +2,10 @@
   "name": "Game.Networking",
   "references": [
     "Game.Domain",
-    "Unity.Collections"
+    "Unity.Collections",
+    "Unity.Transport",
+    "Unity.Transport.Utilities",
+    "Unity.Transport.Error"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
