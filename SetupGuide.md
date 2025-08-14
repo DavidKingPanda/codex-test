@@ -38,6 +38,8 @@ Place the provided `.cs` files into their matching folders.
    - `MovementSystem`
    - `JumpSystem`
    - `ReplicationSystem`
+   - `SurvivalSystem`
+   - `SurvivalReplicationSystem`
 4. Open **File → Build Settings** and enable **Dedicated Server/Server Build** to produce a headless executable. (Leave this unchecked for client builds.)
 
 ## 4. Client Scene
@@ -46,6 +48,8 @@ Place the provided `.cs` files into their matching folders.
 3. `ClientBootstrap` references:
    - `ClientInputSender`
    - `ClientSnapshotReceiver`
+   - `StatsSnapshotReceiver`
+   - `SurvivalUI` (assign hunger & stamina `Slider` UI elements anchored top‑left)
    - a player visual `Transform` used for rendering
    - `CameraFollow` on the main camera for top‑down tracking
 4. Add a `PlayerInput` component:
@@ -83,4 +87,4 @@ Place the provided `.cs` files into their matching folders.
 - **Infrastructure** – glue code (`EventBus`, `ClientInputSender`, `ServerCommandDispatcher`, `ClientBootstrap`, `ServerBootstrap`).
 - **Presentation** – visuals and camera scripts (`CameraFollow`).
 
-This setup yields a clean, event-driven, server‑authoritative ECS base where a player entity moves with WASD, the server replicates the position, and the client camera follows from a top‑down perspective.
+This setup yields a clean, event-driven, server‑authoritative ECS base where a player entity moves with WASD, the server replicates the position and survival stats, and the client camera follows from a top‑down perspective while displaying hunger and stamina bars.
