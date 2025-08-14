@@ -1,7 +1,9 @@
 using System;
 using System.Text;
 using Unity.Collections;
-using Unity.Networking.Transport;
+
+using Unity.Networking.Transport.Utilities;
+using Unity.Networking.Transport.Error;
 using UnityEngine;
 
 namespace Game.Networking
