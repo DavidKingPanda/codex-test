@@ -1,5 +1,5 @@
 using Game.Domain.Commands;
-using Game.EventBus;
+using EventBus = Game.EventBus.EventBus;
 
 namespace Game.Domain
 {

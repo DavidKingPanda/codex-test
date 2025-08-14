@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Game.Domain.ECS;
 using Game.Domain.Events;
-using Game.EventBus;
+using EventBus = Game.EventBus.EventBus;
 using Game.Networking;
 using Game.Networking.Messages;
 using Game.Systems;

@@ -2,7 +2,7 @@ using Game.Components;
 using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Domain.Events;
-using Game.EventBus;
+using EventBus = Game.EventBus.EventBus;
 using UnityEngine;
 
 namespace Game.Systems

@@ -1,7 +1,7 @@
 using Game.Domain;
 using Game.Domain.Commands;
 using Game.Domain.ECS;
-using Game.EventBus;
+using EventBus = Game.EventBus.EventBus;
 using NUnit.Framework;
 using UnityEngine;
 
