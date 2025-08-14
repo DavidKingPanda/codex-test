@@ -12,12 +12,12 @@ namespace Game.Systems
     /// </summary>
     public class ReplicationSystem : ISystem
     {
-        private readonly NetworkManager _networkManager;
+        private readonly INetworkTransport _transport;
         private readonly GameEventBus _eventBus;
 
-        public ReplicationSystem(NetworkManager networkManager, GameEventBus eventBus)
+        public ReplicationSystem(INetworkTransport transport, GameEventBus eventBus)
         {
-            _networkManager = networkManager;
+            _transport = transport;
             _eventBus = eventBus;
             _eventBus.Subscribe<PositionChangedEvent>(OnPositionChanged);
         }
@@ -32,7 +32,7 @@ namespace Game.Systems
             var snapshot = new PositionSnapshot(evt.Entity, evt.Position);
             var payload = JsonUtility.ToJson(snapshot);
             var message = new NetworkMessage(MessageType.PositionSnapshot, payload);
-            _networkManager.SendMessage(message);
+            _transport.SendMessage(message);
         }
     }
 }

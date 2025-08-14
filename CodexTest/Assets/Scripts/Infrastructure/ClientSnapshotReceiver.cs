@@ -1,8 +1,6 @@
 using System.Text;
 using Game.Networking;
 using Game.Networking.Messages;
-using Unity.Collections;
-using Unity.Networking.Transport;
 using UnityEngine;
 
 namespace Game.Infrastructure
@@ -12,11 +10,11 @@ namespace Game.Infrastructure
     /// </summary>
     public class ClientSnapshotReceiver : MonoBehaviour
     {
-        private NetworkManager networkManager;
+        private INetworkTransport networkManager;
         private Transform entityPrefab;
         private readonly System.Collections.Generic.Dictionary<int, Transform> _entities = new();
 
-        public void Initialize(NetworkManager manager, Transform prefab)
+        public void Initialize(INetworkTransport manager, Transform prefab)
         {
             networkManager = manager;
             entityPrefab = prefab;
@@ -28,11 +26,9 @@ namespace Game.Infrastructure
             _entities[entityId] = transform;
         }
 
-        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
+        private void OnDataReceived(int connectionId, byte[] data)
         {
-            using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
-            stream.ReadBytes(bytes);
-            var json = Encoding.UTF8.GetString(bytes.ToArray());
+            var json = Encoding.UTF8.GetString(data);
 
             var message = JsonUtility.FromJson<NetworkMessage>(json);
             if (message.Type != MessageType.PositionSnapshot)

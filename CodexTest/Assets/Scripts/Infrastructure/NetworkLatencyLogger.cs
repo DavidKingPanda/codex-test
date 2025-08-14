@@ -1,8 +1,6 @@
 using System;
 using Game.Networking;
 using Game.Networking.Messages;
-using Unity.Collections;
-using Unity.Networking.Transport;
 using UnityEngine;
 
 namespace Game.Infrastructure
@@ -13,7 +11,7 @@ namespace Game.Infrastructure
     public class NetworkLatencyLogger : MonoBehaviour
     {
         [SerializeField] private float pingInterval = 1f;
-        private NetworkManager _networkManager;
+        private INetworkTransport _transport;
         private float _timer;
 
         /// <summary>
@@ -24,15 +22,15 @@ namespace Game.Infrastructure
         /// <summary>
         /// Injects the network manager and subscribes to data events.
         /// </summary>
-        public void Initialize(NetworkManager manager)
+        public void Initialize(INetworkTransport transport)
         {
-            _networkManager = manager;
-            _networkManager.OnData += OnDataReceived;
+            _transport = transport;
+            _transport.OnData += OnDataReceived;
         }
 
         private void Update()
         {
-            if (_networkManager == null || !_networkManager.IsConnected)
+            if (_transport == null || !_transport.IsConnected)
                 return;
 
             _timer += Time.deltaTime;
@@ -43,15 +41,13 @@ namespace Game.Infrastructure
                 var ping = new Game.Networking.Messages.Ping(timestamp);
                 var payload = JsonUtility.ToJson(ping);
                 var message = new NetworkMessage(MessageType.Ping, payload);
-                _networkManager.SendMessage(message);
+                _transport.SendMessage(message);
             }
         }
 
-        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
+        private void OnDataReceived(int connectionId, byte[] data)
         {
-            using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
-            stream.ReadBytes(bytes);
-            var json = System.Text.Encoding.UTF8.GetString(bytes.ToArray());
+            var json = System.Text.Encoding.UTF8.GetString(data);
             var message = JsonUtility.FromJson<NetworkMessage>(json);
             if (message.Type != MessageType.Ping)
                 return;
@@ -65,9 +61,9 @@ namespace Game.Infrastructure
 
         private void OnDestroy()
         {
-            if (_networkManager != null)
+            if (_transport != null)
             {
-                _networkManager.OnData -= OnDataReceived;
+                _transport.OnData -= OnDataReceived;
             }
         }
     }

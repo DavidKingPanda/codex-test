@@ -4,8 +4,6 @@ using Game.Domain.ECS;
 using GameEventBus = Game.EventBus.EventBus;
 using Game.Networking;
 using Game.Networking.Messages;
-using Unity.Collections;
-using Unity.Networking.Transport;
 using UnityEngine;
 
 namespace Game.Infrastructure
@@ -15,23 +13,21 @@ namespace Game.Infrastructure
     /// </summary>
     public class StatsSnapshotReceiver : MonoBehaviour
     {
-        private NetworkManager _networkManager;
+        private INetworkTransport _transport;
         private GameEventBus _eventBus;
         private int _playerEntityId;
 
-        public void Initialize(NetworkManager manager, GameEventBus eventBus, Entity player)
+        public void Initialize(INetworkTransport transport, GameEventBus eventBus, Entity player)
         {
-            _networkManager = manager;
+            _transport = transport;
             _eventBus = eventBus;
             _playerEntityId = player.Id;
-            _networkManager.OnData += OnDataReceived;
+            _transport.OnData += OnDataReceived;
         }
 
-        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
+        private void OnDataReceived(int connectionId, byte[] data)
         {
-            using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
-            stream.ReadBytes(bytes);
-            var json = Encoding.UTF8.GetString(bytes.ToArray());
+            var json = Encoding.UTF8.GetString(data);
             var message = JsonUtility.FromJson<NetworkMessage>(json);
 
             switch (message.Type)
@@ -57,9 +53,9 @@ namespace Game.Infrastructure
 
         private void OnDestroy()
         {
-            if (_networkManager != null)
+            if (_transport != null)
             {
-                _networkManager.OnData -= OnDataReceived;
+                _transport.OnData -= OnDataReceived;
             }
         }
     }

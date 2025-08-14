@@ -12,22 +12,40 @@ namespace Tests
 {
     public class ReplicationSystemTests
     {
-        private class TestNetworkManager : NetworkManager
+        private class FakeTransport : INetworkTransport
         {
             public readonly List<NetworkMessage> Sent = new();
-            public override void SendMessage<T>(T message)
+            public bool IsServer => false;
+            public bool IsConnected => true;
+            public event System.Action<int> OnClientConnected;
+            public event System.Action<int> OnClientDisconnected;
+            public event System.Action<int, byte[]> OnData;
+            public void StartClient(string address, ushort port) { }
+            public void StartServer(ushort port) { }
+            public void SendBytes(byte[] bytes) { }
+            public void SendBytes(int connectionId, byte[] bytes) { }
+            public void SendMessage<T>(T message)
             {
                 if (message is NetworkMessage nm)
                 {
                     Sent.Add(nm);
                 }
             }
+            public void SendMessage<T>(int connectionId, T message)
+            {
+                if (message is NetworkMessage nm)
+                {
+                    Sent.Add(nm);
+                }
+            }
+            public void Update() { }
+            public void Dispose() { }
         }
 
         [Test]
         public void PositionChangedEvent_SendsSnapshotMessage()
         {
-            var network = new TestNetworkManager();
+            var network = new FakeTransport();
             var eventBus = new GameEventBus();
             var system = new ReplicationSystem(network, eventBus);
 
