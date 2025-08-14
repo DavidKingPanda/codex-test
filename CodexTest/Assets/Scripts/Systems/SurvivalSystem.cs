@@ -31,9 +31,10 @@ namespace Game.Systems
             {
                 var st = stamina;
                 bool isRunning = false;
-                if (_world.TryGetComponent(entity, out MovementStateComponent state))
+                MovementStateComponent movementState;
+                if (_world.TryGetComponent(entity, out movementState))
                 {
-                    isRunning = state.IsRunning;
+                    isRunning = movementState.IsRunning;
                 }
 
                 if (isRunning && st.Current > 0f)
@@ -43,10 +44,10 @@ namespace Game.Systems
                 else if (st.Current <= 0f && isRunning)
                 {
                     // Force entity to stop running when stamina is depleted.
-                    if (_world.TryGetComponent(entity, out MovementStateComponent state))
+                    if (_world.TryGetComponent(entity, out movementState))
                     {
-                        state.IsRunning = false;
-                        _world.SetComponent(entity, state);
+                        movementState.IsRunning = false;
+                        _world.SetComponent(entity, movementState);
                     }
                 }
                 else if (_world.TryGetComponent(entity, out HungerComponent hunger) && hunger.Current > 0f)
