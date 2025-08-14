@@ -14,8 +14,8 @@ namespace Game.Infrastructure
     public class ClientInputSender : MonoBehaviour
     {
         private NetworkManager networkManager;
-        [SerializeField] private float walkSpeed = 2f;
-        [SerializeField] private float runSpeed = 4f;
+        private float walkSpeed;
+        private float runSpeed;
         [SerializeField] private float jumpForce = 5f;
         [SerializeField] private float gravity = -9.81f;
         private Vector2 _input;
@@ -28,12 +28,14 @@ namespace Game.Infrastructure
         /// <summary>
         /// Injects dependencies from ClientBootstrap.
         /// </summary>
-        public void Initialize(NetworkManager manager, Entity playerEntity, Transform target)
+        public void Initialize(NetworkManager manager, Entity playerEntity, Transform target, float walkSpeed, float runSpeed)
         {
             networkManager = manager;
             PlayerEntity = playerEntity;
             _target = target;
             _fixedDeltaTime = 1f / Constants.ServerTickRate;
+            this.walkSpeed = walkSpeed;
+            this.runSpeed = runSpeed;
         }
 
         /// <summary>
