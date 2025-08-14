@@ -1,5 +1,6 @@
 using Game.Domain.Commands;
 using Game.Domain.ECS;
+using Game.Domain.Events;
 using Game.Networking;
 using Game.Networking.Messages;
 using Game.Utils;
@@ -14,6 +15,7 @@ namespace Game.Infrastructure
     public class ClientInputSender : MonoBehaviour
     {
         private NetworkManager networkManager;
+        private EventBus eventBus;
         private float walkSpeed;
         private float runSpeed;
         [SerializeField] private float jumpForce = 5f;
@@ -23,14 +25,16 @@ namespace Game.Infrastructure
         private Transform _target;
         private float _tickAccumulator;
         private float _fixedDeltaTime;
+        private float _currentStamina;
         public Entity PlayerEntity { get; private set; }
 
         /// <summary>
         /// Injects dependencies from ClientBootstrap.
         /// </summary>
-        public void Initialize(NetworkManager manager, Entity playerEntity, Transform target, float walkSpeed, float runSpeed, float jumpForce, float gravity)
+        public void Initialize(NetworkManager manager, EventBus eventBus, Entity playerEntity, Transform target, float walkSpeed, float runSpeed, float jumpForce, float gravity)
         {
             networkManager = manager;
+            this.eventBus = eventBus;
             PlayerEntity = playerEntity;
             _target = target;
             _fixedDeltaTime = 1f / Constants.ServerTickRate;
@@ -38,6 +42,7 @@ namespace Game.Infrastructure
             this.runSpeed = runSpeed;
             this.jumpForce = jumpForce;
             this.gravity = gravity;
+            this.eventBus.Subscribe<StaminaChangedEvent>(OnStaminaChanged);
         }
 
         /// <summary>
@@ -97,7 +102,7 @@ namespace Game.Infrastructure
                     direction = camRight * _input.x + camForward * _input.y;
                 }
 
-                bool isRunning = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed;
+                bool isRunning = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed && _currentStamina > 0f;
                 float speed = isRunning ? runSpeed : walkSpeed;
 
                 if (direction != Vector3.zero)
@@ -125,6 +130,19 @@ namespace Game.Infrastructure
                 }
 
                 _tickAccumulator -= _fixedDeltaTime;
+            }
+        }
+
+        private void OnStaminaChanged(StaminaChangedEvent evt)
+        {
+            _currentStamina = evt.Current;
+        }
+
+        private void OnDestroy()
+        {
+            if (eventBus != null)
+            {
+                eventBus.Unsubscribe<StaminaChangedEvent>(OnStaminaChanged);
             }
         }
     }
