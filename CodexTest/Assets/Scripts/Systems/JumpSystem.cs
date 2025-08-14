@@ -16,7 +16,6 @@ namespace Game.Systems
         private readonly World _world;
         private readonly EventBus _eventBus;
         private float _fixedDeltaTime;
-        private const float Gravity = -9.81f;
 
         public JumpSystem(World world, EventBus eventBus)
         {
@@ -32,9 +31,10 @@ namespace Game.Systems
             foreach (var (entity, vel) in velocities)
             {
                 var velocity = vel;
-                if (_world.TryGetComponent(entity, out PositionComponent position))
+                if (_world.TryGetComponent(entity, out PositionComponent position) &&
+                    _world.TryGetComponent(entity, out JumpSettingsComponent jump))
                 {
-                    velocity.Value += Gravity * _fixedDeltaTime;
+                    velocity.Value += jump.Gravity * _fixedDeltaTime;
                     position.Value.y += velocity.Value * _fixedDeltaTime;
                     if (position.Value.y <= 0f)
                     {
@@ -50,16 +50,17 @@ namespace Game.Systems
 
         private void OnJumpCommand(JumpCommand command)
         {
-            if (_world.TryGetComponent(command.Entity, out PositionComponent position) && position.Value.y <= 0f)
+            if (_world.TryGetComponent(command.Entity, out PositionComponent position) && position.Value.y <= 0f &&
+                _world.TryGetComponent(command.Entity, out JumpSettingsComponent jump))
             {
                 if (_world.TryGetComponent(command.Entity, out VerticalVelocityComponent velocity))
                 {
-                    velocity.Value = command.Force;
+                    velocity.Value = jump.JumpForce;
                     _world.SetComponent(command.Entity, velocity);
                 }
                 else
                 {
-                    _world.AddComponent(command.Entity, new VerticalVelocityComponent { Value = command.Force });
+                    _world.AddComponent(command.Entity, new VerticalVelocityComponent { Value = jump.JumpForce });
                 }
             }
         }

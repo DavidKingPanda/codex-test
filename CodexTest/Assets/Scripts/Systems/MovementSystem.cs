@@ -37,20 +37,20 @@ namespace Game.Systems
 
             // Determine movement mode based on stamina and desired state.
             bool isRunning = command.IsRunning && command.Direction.sqrMagnitude > 0f;
-            float speed = command.Speed;
 
-            if (_world.TryGetComponent(command.Entity, out StaminaComponent stamina))
+            if (_world.TryGetComponent(command.Entity, out StaminaComponent stamina) && isRunning && stamina.Current <= 0f)
             {
-                if (isRunning && stamina.Current <= 0f)
-                {
-                    isRunning = false;
-                }
+                isRunning = false;
+            }
 
-                // Use configured speeds instead of trusting client supplied speed.
-                if (_world.TryGetComponent(command.Entity, out MovementSpeedComponent moveSpeed))
-                {
-                    speed = isRunning ? moveSpeed.RunSpeed : moveSpeed.WalkSpeed;
-                }
+            float speed;
+            if (_world.TryGetComponent(command.Entity, out MovementSpeedComponent moveSpeed))
+            {
+                speed = isRunning ? moveSpeed.RunSpeed : moveSpeed.WalkSpeed;
+            }
+            else
+            {
+                speed = command.Speed;
             }
 
             // Physics-based movement with simple collision check.

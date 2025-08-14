@@ -40,6 +40,15 @@ namespace Game.Systems
                 {
                     st.Current = Mathf.Max(0f, st.Current - st.DrainPerSecond * _fixedDeltaTime);
                 }
+                else if (st.Current <= 0f && isRunning)
+                {
+                    // Force entity to stop running when stamina is depleted.
+                    if (_world.TryGetComponent(entity, out MovementStateComponent state))
+                    {
+                        state.IsRunning = false;
+                        _world.SetComponent(entity, state);
+                    }
+                }
                 else if (_world.TryGetComponent(entity, out HungerComponent hunger) && hunger.Current > 0f)
                 {
                     st.Current = Mathf.Min(st.Max, st.Current + st.RegenPerSecond * _fixedDeltaTime);
