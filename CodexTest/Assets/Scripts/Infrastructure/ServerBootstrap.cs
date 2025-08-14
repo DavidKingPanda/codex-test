@@ -19,6 +19,7 @@ namespace Game.Infrastructure
     {
         [SerializeField] private ushort port = 80;
         [SerializeField] private SurvivalConfig survivalConfig;
+        [SerializeField] private MovementConfig movementConfig;
 
         private World world;
         private EventBus eventBus;
@@ -46,6 +47,10 @@ namespace Game.Infrastructure
             {
                 survivalConfig = ScriptableObject.CreateInstance<SurvivalConfig>();
             }
+            if (movementConfig == null)
+            {
+                movementConfig = ScriptableObject.CreateInstance<MovementConfig>();
+            }
             connectionToEntity = new Dictionary<NetworkConnection, Entity>();
             networkManager.OnClientConnected += OnClientConnected;
             networkManager.OnClientDisconnected += OnClientDisconnected;
@@ -64,7 +69,11 @@ namespace Game.Infrastructure
         {
             var entity = world.CreateEntity();
             world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });
-            var speedComponent = new MovementSpeedComponent { WalkSpeed = 2f, RunSpeed = 4f };
+            var speedComponent = new MovementSpeedComponent
+            {
+                WalkSpeed = movementConfig.WalkSpeed,
+                RunSpeed = movementConfig.RunSpeed
+            };
             world.AddComponent(entity, speedComponent);
             world.AddComponent(entity, new StaminaComponent
             {
