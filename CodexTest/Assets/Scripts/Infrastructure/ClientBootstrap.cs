@@ -82,7 +82,7 @@ namespace Game.Infrastructure
             var entity = new Entity(spawn.EntityId);
             if (inputSender != null)
             {
-                inputSender.Initialize(networkManager, entity, playerVisual);
+                inputSender.Initialize(networkManager, entity, playerVisual, spawn.WalkSpeed, spawn.RunSpeed);
             }
             snapshotReceiver.Initialize(networkManager, playerVisual);
             snapshotReceiver.RegisterEntity(entity.Id, playerVisual);

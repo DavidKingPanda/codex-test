@@ -10,10 +10,20 @@ namespace Game.Networking.Messages
     public struct SpawnPlayer
     {
         public int EntityId;
+        /// <summary>
+        /// Walk speed for local prediction.
+        /// </summary>
+        public float WalkSpeed;
+        /// <summary>
+        /// Run speed for local prediction.
+        /// </summary>
+        public float RunSpeed;
 
-        public SpawnPlayer(Entity entity)
+        public SpawnPlayer(Entity entity, float walkSpeed, float runSpeed)
         {
             EntityId = entity.Id;
+            WalkSpeed = walkSpeed;
+            RunSpeed = runSpeed;
         }
     }
 }

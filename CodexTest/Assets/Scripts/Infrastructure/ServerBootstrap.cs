@@ -64,7 +64,8 @@ namespace Game.Infrastructure
         {
             var entity = world.CreateEntity();
             world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });
-            world.AddComponent(entity, new MovementSpeedComponent { WalkSpeed = 2f, RunSpeed = 4f });
+            var speedComponent = new MovementSpeedComponent { WalkSpeed = 2f, RunSpeed = 4f };
+            world.AddComponent(entity, speedComponent);
             world.AddComponent(entity, new StaminaComponent
             {
                 Current = survivalConfig.MaxStamina,
@@ -84,7 +85,7 @@ namespace Game.Infrastructure
             eventBus.Publish(new HungerChangedEvent(entity, survivalConfig.MaxHunger, survivalConfig.MaxHunger));
             connectionToEntity[connection] = entity;
 
-            var spawn = new SpawnPlayer(entity);
+            var spawn = new SpawnPlayer(entity, speedComponent.WalkSpeed, speedComponent.RunSpeed);
             var payload = JsonUtility.ToJson(spawn);
             var message = new NetworkMessage(MessageType.SpawnPlayer, payload);
             networkManager.SendMessage(connection, message);
