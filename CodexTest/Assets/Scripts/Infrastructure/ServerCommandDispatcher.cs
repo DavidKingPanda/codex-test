@@ -9,6 +9,7 @@ using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Networking;
 using Game.Networking.Messages;
+using Game.EventBus;
 
 namespace Game.Infrastructure
 {

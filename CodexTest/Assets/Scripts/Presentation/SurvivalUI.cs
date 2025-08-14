@@ -1,5 +1,5 @@
 using Game.Domain.Events;
-using Game.Infrastructure;
+using Game.EventBus;
 using UnityEngine;
 using UnityEngine.UI;
 
