@@ -2,7 +2,7 @@ using Game.Components;
 using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Domain.Events;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using UnityEngine;
 
 namespace Game.Systems
@@ -13,10 +13,10 @@ namespace Game.Systems
     public class MovementSystem : ISystem
     {
         private readonly World _world;
-        private readonly EventBus _eventBus;
+        private readonly GameEventBus _eventBus;
         private float _fixedDeltaTime;
 
-        public MovementSystem(World world, EventBus eventBus)
+        public MovementSystem(World world, GameEventBus eventBus)
         {
             _world = world;
             _eventBus = eventBus;

@@ -5,7 +5,7 @@ using System.Text;
 using Unity.Collections;
 using Unity.Networking.Transport;
 using Game.Presentation;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using UnityEngine;
 
 namespace Game.Infrastructure
@@ -26,7 +26,7 @@ namespace Game.Infrastructure
         [SerializeField] private NetworkLatencyLogger latencyLogger;
 
         private NetworkManager networkManager;
-        private EventBus eventBus;
+        private GameEventBus eventBus;
         private bool playerInitialized;
 
         private void Awake()
@@ -60,7 +60,7 @@ namespace Game.Infrastructure
 
         private void Start()
         {
-            eventBus = new EventBus();
+            eventBus = new GameEventBus();
             networkManager = new NetworkManager();
             networkManager.StartClient(address, port);
             networkManager.OnData += OnDataReceived;

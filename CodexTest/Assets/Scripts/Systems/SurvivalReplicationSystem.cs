@@ -2,7 +2,7 @@ using Game.Domain.ECS;
 using Game.Domain.Events;
 using Game.Networking;
 using Game.Networking.Messages;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using UnityEngine;
 
 namespace Game.Systems
@@ -13,9 +13,9 @@ namespace Game.Systems
     public class SurvivalReplicationSystem : ISystem
     {
         private readonly NetworkManager _networkManager;
-        private readonly EventBus _eventBus;
+        private readonly GameEventBus _eventBus;
 
-        public SurvivalReplicationSystem(NetworkManager networkManager, EventBus eventBus)
+        public SurvivalReplicationSystem(NetworkManager networkManager, GameEventBus eventBus)
         {
             _networkManager = networkManager;
             _eventBus = eventBus;

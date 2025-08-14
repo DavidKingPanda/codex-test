@@ -2,7 +2,7 @@ using Game.Components;
 using Game.Domain.Commands;
 using Game.Domain.ECS;
 using Game.Domain.Events;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using System.Linq;
 using UnityEngine;
 
@@ -14,10 +14,10 @@ namespace Game.Systems
     public class JumpSystem : ISystem
     {
         private readonly World _world;
-        private readonly EventBus _eventBus;
+        private readonly GameEventBus _eventBus;
         private float _fixedDeltaTime;
 
-        public JumpSystem(World world, EventBus eventBus)
+        public JumpSystem(World world, GameEventBus eventBus)
         {
             _world = world;
             _eventBus = eventBus;

@@ -1,7 +1,7 @@
 using System.Text;
 using Game.Domain.Events;
 using Game.Domain.ECS;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 using Game.Networking;
 using Game.Networking.Messages;
 using Unity.Collections;
@@ -16,10 +16,10 @@ namespace Game.Infrastructure
     public class StatsSnapshotReceiver : MonoBehaviour
     {
         private NetworkManager _networkManager;
-        private EventBus _eventBus;
+        private GameEventBus _eventBus;
         private int _playerEntityId;
 
-        public void Initialize(NetworkManager manager, EventBus eventBus, Entity player)
+        public void Initialize(NetworkManager manager, GameEventBus eventBus, Entity player)
         {
             _networkManager = manager;
             _eventBus = eventBus;

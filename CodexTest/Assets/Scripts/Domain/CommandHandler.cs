@@ -1,5 +1,5 @@
 using Game.Domain.Commands;
-using EventBus = Game.EventBus.EventBus;
+using GameEventBus = Game.EventBus.EventBus;
 
 namespace Game.Domain
 {
@@ -8,9 +8,9 @@ namespace Game.Domain
     /// </summary>
     public class CommandHandler
     {
-        private readonly EventBus _eventBus;
+        private readonly GameEventBus _eventBus;
 
-        public CommandHandler(EventBus eventBus)
+        public CommandHandler(GameEventBus eventBus)
         {
             _eventBus = eventBus;
         }
