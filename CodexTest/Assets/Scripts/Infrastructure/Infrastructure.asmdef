@@ -8,7 +8,6 @@
     "Game.Utils",
     "Game.EventBus",
     "Unity.Collections",
-    "Unity.Transport",
     "Unity.InputSystem"
   ],
   "includePlatforms": [],

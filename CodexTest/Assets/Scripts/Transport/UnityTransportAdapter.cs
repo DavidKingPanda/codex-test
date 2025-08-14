@@ -13,7 +13,7 @@ namespace Game.Networking.Transport
     /// Adapter that wraps Unity.Transport and exposes it via the INetworkTransport interface.
     /// This file resides outside of any asmdef so it can directly reference Unity Transport types.
     /// </summary>
-    public class UnityTransportAdapter : INetworkTransport
+    public class UnityTransportAdapter : MonoBehaviour, INetworkTransport
     {
         private NetworkDriver _driver;
         private NativeList<NetworkConnection> _connections;
@@ -61,7 +61,7 @@ namespace Game.Networking.Transport
             IsServer = true;
         }
 
-        public void Update()
+        void INetworkTransport.Update()
         {
             if (!_driver.IsCreated)
                 return;
@@ -182,6 +182,11 @@ namespace Game.Networking.Transport
             {
                 _connections.Dispose();
             }
+        }
+
+        private void OnDestroy()
+        {
+            Dispose();
         }
     }
 }
