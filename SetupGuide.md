@@ -54,6 +54,7 @@ Place the provided `.cs` files into their matching folders.
    - `ClientSnapshotReceiver`
    - `StatsSnapshotReceiver`
    - `SurvivalUI` (assign hunger & stamina `Slider` UI elements anchored top‑left)
+   - `NetworkLatencyLogger` and a `PingDisplay` text to visualize round-trip time
    - a player visual `Transform` used for rendering
    - `CameraFollow` on the main camera for top‑down tracking
 4. Add a `PlayerInput` component:

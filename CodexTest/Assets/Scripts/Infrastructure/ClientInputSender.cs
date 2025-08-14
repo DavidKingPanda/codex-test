@@ -27,6 +27,7 @@ namespace Game.Infrastructure
         private float _tickAccumulator;
         private float _fixedDeltaTime;
         private float _currentStamina;
+        private bool _forceWalk;
         public Entity PlayerEntity { get; private set; }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace Game.Infrastructure
             if (networkManager == null || !networkManager.IsConnected || _target == null)
                 return;
 
-            if (context.performed && Mathf.Abs(_verticalVelocity) < 0.01f && _target.position.y <= 0f)
+            if (context.performed && Mathf.Abs(_verticalVelocity) < 0.01f && _target.position.y <= 0.01f)
             {
                 _verticalVelocity = jumpForce;
                 var command = new JumpCommand(PlayerEntity);
@@ -103,7 +104,12 @@ namespace Game.Infrastructure
                     direction = camRight * _input.x + camForward * _input.y;
                 }
 
-                bool isRunning = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed && _currentStamina > 0f;
+                bool wantsRun = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed;
+                if (_forceWalk && Keyboard.current != null && !Keyboard.current.leftShiftKey.isPressed)
+                {
+                    _forceWalk = false;
+                }
+                bool isRunning = wantsRun && !_forceWalk && _currentStamina > 0f;
                 float speed = isRunning ? runSpeed : walkSpeed;
 
                 if (direction != Vector3.zero)
@@ -137,6 +143,10 @@ namespace Game.Infrastructure
         private void OnStaminaChanged(StaminaChangedEvent evt)
         {
             _currentStamina = evt.Current;
+            if (_currentStamina <= 0f)
+            {
+                _forceWalk = true;
+            }
         }
 
         private void OnDestroy()

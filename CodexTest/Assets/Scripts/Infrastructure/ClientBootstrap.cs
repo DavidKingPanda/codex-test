@@ -22,6 +22,7 @@ namespace Game.Infrastructure
         [SerializeField] private StatsSnapshotReceiver statsReceiver;
         [SerializeField] private SurvivalUI survivalUI;
         [SerializeField] private NetworkLatencyLogger latencyLogger;
+        [SerializeField] private PingDisplay pingDisplay;
 
         [SerializeField] private MonoBehaviour transport;
         private INetworkTransport networkManager;
@@ -72,6 +73,10 @@ namespace Game.Infrastructure
             if (latencyLogger != null)
             {
                 latencyLogger.Initialize(networkManager);
+                if (pingDisplay != null)
+                {
+                    latencyLogger.OnPingUpdated += pingDisplay.UpdatePing;
+                }
             }
         }
 
@@ -117,6 +122,10 @@ namespace Game.Infrastructure
             {
                 networkManager.OnData -= OnDataReceived;
                 networkManager.Dispose();
+            }
+            if (latencyLogger != null && pingDisplay != null)
+            {
+                latencyLogger.OnPingUpdated -= pingDisplay.UpdatePing;
             }
         }
     }
