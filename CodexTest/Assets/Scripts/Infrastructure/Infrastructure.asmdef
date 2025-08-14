@@ -1,6 +1,6 @@
 {
   "name": "Game.Infrastructure",
-  "references": [],
+  "references": ["Game.Domain", "Game.Components", "Game.Systems", "Game.Networking", "Game.Utils", "Game.EventBus"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

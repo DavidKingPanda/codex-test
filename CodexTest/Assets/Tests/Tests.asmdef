@@ -1,6 +1,6 @@
 {
   "name": "Tests",
-  "references": ["Game.Domain", "Game.Components", "Game.Systems", "Game.Infrastructure"],
+  "references": ["Game.Domain", "Game.Components", "Game.Systems", "Game.Networking", "Game.EventBus"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

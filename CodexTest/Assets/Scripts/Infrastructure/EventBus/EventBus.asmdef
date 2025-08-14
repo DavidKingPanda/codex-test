@@ -1,6 +1,6 @@
 {
-  "name": "Game.Domain",
-  "references": ["Game.EventBus"],
+  "name": "Game.EventBus",
+  "references": [],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
