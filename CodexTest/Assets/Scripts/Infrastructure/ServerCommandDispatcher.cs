@@ -20,14 +20,14 @@ namespace Game.Infrastructure
     {
         private readonly NetworkManager _networkManager;
         private readonly GameEventBus _eventBus;
-        private readonly Dictionary<NetworkDriver.Connection, Entity> _connectionToEntity;
-        private readonly Dictionary<MessageType, Action<NetworkDriver.Connection, string>> _handlers = new();
+        private readonly Dictionary<NetworkConnection, Entity> _connectionToEntity;
+        private readonly Dictionary<MessageType, Action<NetworkConnection, string>> _handlers = new();
 
 
         public ServerCommandDispatcher(
             NetworkManager networkManager,
             GameEventBus eventBus,
-            Dictionary<NetworkDriver.Connection, Entity> connectionToEntity)
+            Dictionary<NetworkConnection, Entity> connectionToEntity)
         {
             _networkManager = networkManager;
             _eventBus = eventBus;
@@ -62,7 +62,7 @@ namespace Game.Infrastructure
             };
         }
 
-        private void OnDataReceived(NetworkDriver.Connection connection, DataStreamReader stream)
+        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
         {
             using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
             stream.ReadBytes(bytes);
