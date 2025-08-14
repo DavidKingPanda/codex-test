@@ -1,4 +1,3 @@
-using Game.Infrastructure;
 using TMPro;
 using UnityEngine;
 
@@ -11,25 +10,8 @@ namespace Game.Presentation
     public class PingDisplay : MonoBehaviour
     {
         [SerializeField] private TMP_Text pingText;
-        [SerializeField] private NetworkLatencyLogger latencyLogger;
 
-        private void OnEnable()
-        {
-            if (latencyLogger != null)
-            {
-                latencyLogger.OnPingUpdated += HandlePingUpdated;
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (latencyLogger != null)
-            {
-                latencyLogger.OnPingUpdated -= HandlePingUpdated;
-            }
-        }
-
-        private void HandlePingUpdated(long rtt)
+        public void UpdatePing(long rtt)
         {
             if (pingText != null)
             {
@@ -38,4 +20,3 @@ namespace Game.Presentation
         }
     }
 }
-
