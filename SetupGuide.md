@@ -42,8 +42,9 @@ Place the provided `.cs` files into their matching folders.
    - `SurvivalReplicationSystem`
 
    Player movement uses a `MovementSpeedComponent` configured on the server. Walk and run speeds are sent to the client when the player spawns so prediction matches the authoritative simulation.
-4. Create a **SurvivalConfig** asset (`Right Click → Create → Config → SurvivalConfig`) and assign it to `ServerBootstrap` to tweak starting stamina, hunger, drain, and regeneration rates.
-5. Open **File → Build Settings** and enable **Dedicated Server/Server Build** to produce a headless executable. (Leave this unchecked for client builds.)
+4. Create a **MovementConfig** asset (`Right Click → Create → Config → MovementConfig`) and assign it to `ServerBootstrap` to configure authoritative walk and run speeds.
+5. Create a **SurvivalConfig** asset (`Right Click → Create → Config → SurvivalConfig`) and assign it to `ServerBootstrap` to tweak starting stamina, hunger, drain, and regeneration rates.
+6. Open **File → Build Settings** and enable **Dedicated Server/Server Build** to produce a headless executable. (Leave this unchecked for client builds.)
 
 ## 4. Client Scene
 1. Create a new scene for the client.
