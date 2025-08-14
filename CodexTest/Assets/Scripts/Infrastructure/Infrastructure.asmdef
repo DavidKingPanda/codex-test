@@ -1,6 +1,16 @@
 {
   "name": "Game.Infrastructure",
-  "references": ["Game.Domain", "Game.Components", "Game.Systems", "Game.Networking", "Game.Utils", "Game.EventBus"],
+  "references": [
+    "Game.Domain",
+    "Game.Components",
+    "Game.Systems",
+    "Game.Networking",
+    "Game.Utils",
+    "Game.EventBus",
+    "Unity.Collections",
+    "Unity.Transport",
+    "Unity.InputSystem"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
