@@ -8,7 +8,9 @@ namespace Game.Networking.Messages
         PositionSnapshot = 2,
         JumpCommand = 3,
         SpawnPlayer = 4,
-        Ping = 5
+        Ping = 5,
+        HungerSnapshot = 6,
+        StaminaSnapshot = 7
     }
 
     /// <summary>

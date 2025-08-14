@@ -20,9 +20,12 @@ namespace Game.Infrastructure
         [SerializeField] private Transform playerVisual;
         [SerializeField] private CameraController cameraController;
         [SerializeField] private ClientSnapshotReceiver snapshotReceiver;
+        [SerializeField] private StatsSnapshotReceiver statsReceiver;
+        [SerializeField] private SurvivalUI survivalUI;
         [SerializeField] private NetworkLatencyLogger latencyLogger;
 
         private NetworkManager networkManager;
+        private EventBus eventBus;
         private bool playerInitialized;
 
         private void Awake()
@@ -56,6 +59,7 @@ namespace Game.Infrastructure
 
         private void Start()
         {
+            eventBus = new EventBus();
             networkManager = new NetworkManager();
             networkManager.StartClient(address, port);
             networkManager.OnData += OnDataReceived;
@@ -82,6 +86,14 @@ namespace Game.Infrastructure
             }
             snapshotReceiver.Initialize(networkManager, playerVisual);
             snapshotReceiver.RegisterEntity(entity.Id, playerVisual);
+            if (statsReceiver != null)
+            {
+                statsReceiver.Initialize(networkManager, eventBus, entity);
+            }
+            if (survivalUI != null)
+            {
+                survivalUI.Initialize(eventBus);
+            }
             if (cameraController != null && playerVisual != null)
             {
                 cameraController.SetTarget(playerVisual);
