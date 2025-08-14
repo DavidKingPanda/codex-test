@@ -3,7 +3,6 @@ using Game.Domain;
 using Game.Domain.ECS;
 using Game.Domain.Events;
 using Game.Networking;
-using Game.Networking.Transport;
 using Game.Networking.Messages;
 using Game.Systems;
 using Game.Utils;
@@ -24,6 +23,7 @@ namespace Game.Infrastructure
 
         private World world;
         private GameEventBus eventBus;
+        [SerializeField] private MonoBehaviour transport;
         private INetworkTransport networkManager;
         private MovementSystem movementSystem;
         private ReplicationSystem replicationSystem;
@@ -42,7 +42,13 @@ namespace Game.Infrastructure
         {
             eventBus = new GameEventBus();
             world = new World();
-            networkManager = new UnityTransportAdapter();
+            networkManager = transport as INetworkTransport;
+            if (networkManager == null)
+            {
+                Debug.LogError("Transport does not implement INetworkTransport");
+                enabled = false;
+                return;
+            }
             networkManager.StartServer(port);
             if (survivalConfig == null)
             {

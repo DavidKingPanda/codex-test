@@ -1,6 +1,5 @@
 using Game.Domain.ECS;
 using Game.Networking;
-using Game.Networking.Transport;
 using Game.Networking.Messages;
 using System.Text;
 using Game.Presentation;
@@ -24,6 +23,7 @@ namespace Game.Infrastructure
         [SerializeField] private SurvivalUI survivalUI;
         [SerializeField] private NetworkLatencyLogger latencyLogger;
 
+        [SerializeField] private MonoBehaviour transport;
         private INetworkTransport networkManager;
         private GameEventBus eventBus;
         private bool playerInitialized;
@@ -60,7 +60,13 @@ namespace Game.Infrastructure
         private void Start()
         {
             eventBus = new GameEventBus();
-            networkManager = new UnityTransportAdapter();
+            networkManager = transport as INetworkTransport;
+            if (networkManager == null)
+            {
+                Debug.LogError("Transport does not implement INetworkTransport");
+                enabled = false;
+                return;
+            }
             networkManager.StartClient(address, port);
             networkManager.OnData += OnDataReceived;
             if (latencyLogger != null)
