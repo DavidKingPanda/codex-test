@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Unity.Collections;
-using Unity.Networking.Transport;
 using UnityEngine;
 
 using Game.Domain.Commands;
@@ -18,16 +16,16 @@ namespace Game.Infrastructure
     /// </summary>
     public class ServerCommandDispatcher : IDisposable
     {
-        private readonly NetworkManager _networkManager;
+        private readonly INetworkTransport _networkManager;
         private readonly GameEventBus _eventBus;
-        private readonly Dictionary<NetworkConnection, Entity> _connectionToEntity;
-        private readonly Dictionary<MessageType, Action<NetworkConnection, string>> _handlers = new();
+        private readonly Dictionary<int, Entity> _connectionToEntity;
+        private readonly Dictionary<MessageType, Action<int, string>> _handlers = new();
 
 
         public ServerCommandDispatcher(
-            NetworkManager networkManager,
+            INetworkTransport networkManager,
             GameEventBus eventBus,
-            Dictionary<NetworkConnection, Entity> connectionToEntity)
+            Dictionary<int, Entity> connectionToEntity)
         {
             _networkManager = networkManager;
             _eventBus = eventBus;
@@ -35,42 +33,40 @@ namespace Game.Infrastructure
 
             _networkManager.OnData += OnDataReceived;
 
-            _handlers[MessageType.MoveCommand] = (conn, payload) =>
+            _handlers[MessageType.MoveCommand] = (id, payload) =>
             {
                 var cmd = JsonUtility.FromJson<MoveCommand>(payload);
-                if (!cmd.Equals(default(MoveCommand)) && _connectionToEntity.TryGetValue(conn, out var entity))
+                if (!cmd.Equals(default(MoveCommand)) && _connectionToEntity.TryGetValue(id, out var entity))
                 {
                     var validated = new MoveCommand(entity, cmd.Direction, cmd.Speed, cmd.IsRunning);
                     _eventBus.Publish(validated);
                 }
             };
 
-            _handlers[MessageType.JumpCommand] = (conn, payload) =>
+            _handlers[MessageType.JumpCommand] = (id, payload) =>
             {
                 var cmd = JsonUtility.FromJson<JumpCommand>(payload);
-                if (!cmd.Equals(default(JumpCommand)) && _connectionToEntity.TryGetValue(conn, out var entity))
+                if (!cmd.Equals(default(JumpCommand)) && _connectionToEntity.TryGetValue(id, out var entity))
                 {
                     var validated = new JumpCommand(entity);
                     _eventBus.Publish(validated);
                 }
             };
 
-            _handlers[MessageType.Ping] = (conn, payload) =>
+            _handlers[MessageType.Ping] = (id, payload) =>
             {
                 var message = new NetworkMessage(MessageType.Ping, payload);
-                _networkManager.SendMessage(conn, message);
+                _networkManager.SendMessage(id, message);
             };
         }
 
-        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
+        private void OnDataReceived(int connectionId, byte[] data)
         {
-            using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
-            stream.ReadBytes(bytes);
-            var json = Encoding.UTF8.GetString(bytes.ToArray());
+            var json = Encoding.UTF8.GetString(data);
             var message = JsonUtility.FromJson<NetworkMessage>(json);
             if (_handlers.TryGetValue(message.Type, out var handler))
             {
-                handler(connection, message.Payload);
+                handler(connectionId, message.Payload);
             }
         }
 

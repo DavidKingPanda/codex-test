@@ -1,9 +1,8 @@
 using Game.Domain.ECS;
 using Game.Networking;
+using Game.Networking.Transport;
 using Game.Networking.Messages;
 using System.Text;
-using Unity.Collections;
-using Unity.Networking.Transport;
 using Game.Presentation;
 using GameEventBus = Game.EventBus.EventBus;
 using UnityEngine;
@@ -25,7 +24,7 @@ namespace Game.Infrastructure
         [SerializeField] private SurvivalUI survivalUI;
         [SerializeField] private NetworkLatencyLogger latencyLogger;
 
-        private NetworkManager networkManager;
+        private INetworkTransport networkManager;
         private GameEventBus eventBus;
         private bool playerInitialized;
 
@@ -61,7 +60,7 @@ namespace Game.Infrastructure
         private void Start()
         {
             eventBus = new GameEventBus();
-            networkManager = new NetworkManager();
+            networkManager = new UnityTransportAdapter();
             networkManager.StartClient(address, port);
             networkManager.OnData += OnDataReceived;
             if (latencyLogger != null)
@@ -70,11 +69,9 @@ namespace Game.Infrastructure
             }
         }
 
-        private void OnDataReceived(NetworkConnection connection, DataStreamReader stream)
+        private void OnDataReceived(int connectionId, byte[] data)
         {
-            using var bytes = new NativeArray<byte>(stream.Length, Allocator.Temp);
-            stream.ReadBytes(bytes);
-            var json = Encoding.UTF8.GetString(bytes.ToArray());
+            var json = Encoding.UTF8.GetString(data);
             var message = JsonUtility.FromJson<NetworkMessage>(json);
             if (message.Type != MessageType.SpawnPlayer || playerInitialized)
                 return;

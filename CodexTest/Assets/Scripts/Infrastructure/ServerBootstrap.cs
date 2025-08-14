@@ -3,11 +3,11 @@ using Game.Domain;
 using Game.Domain.ECS;
 using Game.Domain.Events;
 using Game.Networking;
+using Game.Networking.Transport;
 using Game.Networking.Messages;
 using Game.Systems;
 using Game.Utils;
 using System.Collections.Generic;
-using Unity.Networking.Transport;
 using GameEventBus = Game.EventBus.EventBus;
 using UnityEngine;
 
@@ -24,7 +24,7 @@ namespace Game.Infrastructure
 
         private World world;
         private GameEventBus eventBus;
-        private NetworkManager networkManager;
+        private INetworkTransport networkManager;
         private MovementSystem movementSystem;
         private ReplicationSystem replicationSystem;
         private JumpSystem jumpSystem;
@@ -32,7 +32,7 @@ namespace Game.Infrastructure
         private SurvivalReplicationSystem survivalReplicationSystem;
         private ServerCommandDispatcher dispatcher;
         private CommandHandler commandHandler;
-        private Dictionary<NetworkConnection, Entity> connectionToEntity;
+        private Dictionary<int, Entity> connectionToEntity;
         private float tickAccumulator;
         private float fixedDeltaTime;
 
@@ -42,7 +42,7 @@ namespace Game.Infrastructure
         {
             eventBus = new GameEventBus();
             world = new World();
-            networkManager = new NetworkManager();
+            networkManager = new UnityTransportAdapter();
             networkManager.StartServer(port);
             if (survivalConfig == null)
             {
@@ -52,7 +52,7 @@ namespace Game.Infrastructure
             {
                 movementConfig = ScriptableObject.CreateInstance<MovementConfig>();
             }
-            connectionToEntity = new Dictionary<NetworkConnection, Entity>();
+            connectionToEntity = new Dictionary<int, Entity>();
             networkManager.OnClientConnected += OnClientConnected;
             networkManager.OnClientDisconnected += OnClientDisconnected;
             dispatcher = new ServerCommandDispatcher(networkManager, eventBus, connectionToEntity);
@@ -66,7 +66,7 @@ namespace Game.Infrastructure
             _initialized = true;
         }
 
-        private void OnClientConnected(NetworkConnection connection)
+        private void OnClientConnected(int connectionId)
         {
             var entity = world.CreateEntity();
             world.AddComponent(entity, new PositionComponent { Value = Vector3.zero });
@@ -98,17 +98,17 @@ namespace Game.Infrastructure
             eventBus.Publish(new PositionChangedEvent(entity, Vector3.zero));
             eventBus.Publish(new StaminaChangedEvent(entity, survivalConfig.MaxStamina, survivalConfig.MaxStamina));
             eventBus.Publish(new HungerChangedEvent(entity, survivalConfig.MaxHunger, survivalConfig.MaxHunger));
-            connectionToEntity[connection] = entity;
+            connectionToEntity[connectionId] = entity;
 
             var spawn = new SpawnPlayer(entity, speedComponent.WalkSpeed, speedComponent.RunSpeed, movementConfig.JumpForce, movementConfig.Gravity);
             var payload = JsonUtility.ToJson(spawn);
             var message = new NetworkMessage(MessageType.SpawnPlayer, payload);
-            networkManager.SendMessage(connection, message);
+            networkManager.SendMessage(connectionId, message);
         }
 
-        private void OnClientDisconnected(NetworkConnection connection)
+        private void OnClientDisconnected(int connectionId)
         {
-            connectionToEntity.Remove(connection);
+            connectionToEntity.Remove(connectionId);
         }
 
         private void Update()

@@ -12,12 +12,12 @@ namespace Game.Systems
     /// </summary>
     public class SurvivalReplicationSystem : ISystem
     {
-        private readonly NetworkManager _networkManager;
+        private readonly INetworkTransport _transport;
         private readonly GameEventBus _eventBus;
 
-        public SurvivalReplicationSystem(NetworkManager networkManager, GameEventBus eventBus)
+        public SurvivalReplicationSystem(INetworkTransport transport, GameEventBus eventBus)
         {
-            _networkManager = networkManager;
+            _transport = transport;
             _eventBus = eventBus;
             _eventBus.Subscribe<StaminaChangedEvent>(OnStaminaChanged);
             _eventBus.Subscribe<HungerChangedEvent>(OnHungerChanged);
@@ -33,7 +33,7 @@ namespace Game.Systems
             var snapshot = new StaminaSnapshot(evt.Entity.Id, evt.Current, evt.Max);
             var payload = JsonUtility.ToJson(snapshot);
             var message = new NetworkMessage(MessageType.StaminaSnapshot, payload);
-            _networkManager.SendMessage(message);
+            _transport.SendMessage(message);
         }
 
         private void OnHungerChanged(HungerChangedEvent evt)
@@ -41,7 +41,7 @@ namespace Game.Systems
             var snapshot = new HungerSnapshot(evt.Entity.Id, evt.Current, evt.Max);
             var payload = JsonUtility.ToJson(snapshot);
             var message = new NetworkMessage(MessageType.HungerSnapshot, payload);
-            _networkManager.SendMessage(message);
+            _transport.SendMessage(message);
         }
     }
 }

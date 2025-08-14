@@ -15,7 +15,7 @@ namespace Game.Infrastructure
     /// </summary>
     public class ClientInputSender : MonoBehaviour
     {
-        private NetworkManager networkManager;
+        private INetworkTransport networkManager;
         private GameEventBus eventBus;
         private float walkSpeed;
         private float runSpeed;
@@ -32,7 +32,7 @@ namespace Game.Infrastructure
         /// <summary>
         /// Injects dependencies from ClientBootstrap.
         /// </summary>
-        public void Initialize(NetworkManager manager, GameEventBus eventBus, Entity playerEntity, Transform target, float walkSpeed, float runSpeed, float jumpForce, float gravity)
+        public void Initialize(INetworkTransport manager, GameEventBus eventBus, Entity playerEntity, Transform target, float walkSpeed, float runSpeed, float jumpForce, float gravity)
         {
             networkManager = manager;
             this.eventBus = eventBus;
