@@ -1,15 +1,10 @@
 {
-  "name": "Game.Infrastructure",
+  "name": "Game.Presentation",
   "references": [
     "Game.Domain",
-    "Game.Components",
-    "Game.Systems",
-    "Game.Networking",
-    "Game.Utils",
     "Game.EventBus",
-    "Game.Presentation",
-    "Unity.Collections",
-    "Unity.InputSystem"
+    "UnityEngine.UI",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
